@@ -46,6 +46,7 @@ class tracker {
         global $PAGE, $OUTPUT, $USER;
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
+        @header('Feature-Policy', "vibrate 'none'; ambient-light-sensor 'none';");
         $template->proview_url = get_config('local_proview', 'proview_url');
         $template->token = get_config('local_proview', 'token');
         $template->enabled = get_config('local_proview', 'enabled');
