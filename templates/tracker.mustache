@@ -1,0 +1,90 @@
+{{!
+    This file is part the Local proview plugin for Moodle
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_proview/tracker
+
+    Template for adding proview tracking script.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * token Proview token code
+    * proview_url Plugin url
+    * session_id Session ID to track and map sessions with
+
+    Example context (json):
+    { "token": U-9021015, "proview_url": '//cdn.proview.io/init.js','session_id': "U1234" }
+}}
+{{#js}}
+    {{#enabled}}
+        let current = window.location.href;
+        let childOrigin = '*';  // can be location origin, replace with you domain
+        if(current.match('mod/quiz/(attempt|summary)') ){
+            if( window.self == window.top) {
+                let params = new URLSearchParams({
+                    url: current,
+                    token: '{{token}}',
+                    proview_url: '{{proview_url}}',
+                    clear: false,
+                    screen: false,
+                    profile: {{profile_id}}
+                });
+                window.location.href = '/local/proview/frame.php?'+params.toString();
+            } else {
+               
+
+                function receiveMessage(event) {
+                //  if (event.origin == childOrigin) {
+                    if(event.data.type == 'startedProview') {
+                      onProviewStart(...event.data.args);
+                    }
+
+                    if(event.data.type =='stoppedProview') {
+                      onProviewStop()
+                    }
+                  }
+                // }
+                window.addEventListener("message", receiveMessage, false);
+
+                function startProviewOnParent() {
+                  //postmessage to parent window to start proview
+                  parent.postMessage({type: 'startProview'},childOrigin);
+                }
+
+                function onProviewStart(err,id) {
+                  // alert('Proview Started: PlayBackID - ' + id );
+                }
+                $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
+                  parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+                })
+
+                function onProviewStop() {
+
+                  // alert('Proview stopped');
+                }
+            }
+        }
+        if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ){
+          parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+        }
+
+    {{/enabled}}
+
+{{/js}}
