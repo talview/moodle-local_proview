@@ -50,7 +50,7 @@ class tracker {
         $template->token = get_config('local_proview', 'token');
         $template->enabled = get_config('local_proview', 'enabled');
         $template->profile_id = $USER->id;
-
+        @header_remove('Feature-Policy');
         if ($pageinfo && !empty($template->token)) {
             // The templates only contains a "{js}" block; so we don't care about
             // the output; only that the $PAGE->requires are filled.
