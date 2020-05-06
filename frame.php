@@ -81,7 +81,7 @@ echo $OUTPUT->header();
 
     //Javascript function to start proview invoked upon postmessage from iframe
     function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
-      let url = proview_url || '//cdn.proview.io/v5.0.7-4/init.js'
+      let url = proview_url || '//cdn.proview.io/init.js';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
       (function(i,s,o,g,r,a,m){i['TalviewProctor']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
