@@ -44,7 +44,7 @@ function local_proview_before_footer() {
 function local_proview_before_http_headers() {
     injector::inject();
     if(!headers_sent()) {
-        @header_remove('Feature-Policy');
+        @header_remove('"Feature-Policy');
         @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none';");
     }
 
