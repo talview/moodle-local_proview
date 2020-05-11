@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die;
 
 use local_proview\injector;
 
+function local_proview_extend_navigation() {
+    injector::inject();
+}
 /**
  * Output callback, available since Moodle 3.3
  *
