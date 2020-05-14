@@ -29,15 +29,16 @@ defined('MOODLE_INTERNAL') || die;
 
 use local_proview\injector;
 
-function local_proview_extend_navigation() {
-    injector::inject();
-}
 /**
  * Output callback, available since Moodle 3.3
  *
  */
 function local_proview_before_footer() {
     injector::inject();
+//    if(!headers_sent()){
+//        @header_remove('Feature-Policy');
+//        @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none'; camera: '*';");
+//    }
 }
 
 /**
@@ -46,6 +47,4 @@ function local_proview_before_footer() {
  */
 function local_proview_before_http_headers() {
     injector::inject();
-    @header_remove('Feature-Policy');
-    @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none'; camera: '*';");
 }

@@ -127,11 +127,9 @@ echo $OUTPUT->header();
       const urlParams = new URLSearchParams(window.location.search);
       window.iframeUrl = urlParams.get('url');
       document.getElementById('contentIFrame').src = iframeUrl;
-      
       startProview(urlParams.get('token'),urlParams.get('profile'),urlParams.get('proview_url'))
     })();
 </script>
 
 
-<?php 
-echo $OUTPUT->footer();
+<?php echo $OUTPUT->footer();
