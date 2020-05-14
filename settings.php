@@ -53,4 +53,11 @@ if (is_siteadmin()) {
     $default = '';
     $setting = new admin_setting_configtext($name, $title, $description, $default);
     $settings->add($setting);
+
+    $name = 'local_proview/root_dir';
+    $title = get_string('root_dir', 'local_proview');
+    $description = get_string('root_dir_desc', 'local_proview');
+    $default = '/';
+    $setting = new admin_setting_configtext($name, $title, $description, $default);
+    $settings->add($setting);
 }

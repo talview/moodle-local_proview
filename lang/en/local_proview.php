@@ -32,7 +32,8 @@ $string['token'] = 'Proview Token';
 $string['token_desc'] = 'For example: U12345678';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
-
+$string['root_dir'] = 'Root Dir';
+$string['root_dir_desc'] = 'Root Dir';
 
 // /*
 //  * GDPR compliant
