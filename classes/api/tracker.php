@@ -49,6 +49,7 @@ class tracker {
         $template->proview_url = get_config('local_proview', 'proview_url');
         $template->token = get_config('local_proview', 'token');
         $template->enabled = get_config('local_proview', 'enabled');
+        $template->root_dir = get_config('local_proview', 'root_dir');
         $template->profile_id = $USER->id;
         @header_remove('Feature-Policy');
         if ($pageinfo && !empty($template->token)) {

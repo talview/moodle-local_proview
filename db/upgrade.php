@@ -42,6 +42,7 @@ function xmldb_local_proview_upgrade($oldversion) {
             'enabled'       => true,
             'token'         => '',
             'proview_url'   => '//cdn.proview.io/init.js',
+            'root_dir'      => '/'
         );
         foreach ($options as $key => $value ) {
             $new = new stdClass();
