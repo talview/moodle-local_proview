@@ -126,7 +126,6 @@ echo $OUTPUT->header();
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
       window.iframeUrl = urlParams.get('url');
-      document.getElementById('contentIFrame').src = iframeUrl;
       startProview(urlParams.get('token'),urlParams.get('profile'),urlParams.get('proview_url'))
     })();
 </script>
