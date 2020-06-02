@@ -83,7 +83,7 @@ echo $OUTPUT->header();
     function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
       let url = proview_url || '//cdn.proview.io/init.js';
       //Setting src attribute as error page URL so if the proview is not loaded error page will be shown
-      document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/';
+      document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
       (function(i,s,o,g,r,a,m){i['TalviewProctor']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
