@@ -46,23 +46,16 @@ class injector {
      */
     public static function inject() {
         global $USER, $COURSE, $DB;
-        $is_proctored = true;
-        $group_list = $USER->groupmember[$COURSE->id]; //fetching the group for the current course.
-
         //Logic for enabling specific user to use proctered assessment STARTS
-        if( !empty($group_list) ) {
-            foreach ($group_list as $group) {
-                $group_members = $DB->get_record('groups_members', ['id' => $group]);//request to get groupmembership details.
-                
-                $group_details = $DB->get_record('groups', ['id' => $group_members->groupid]);// request to get group details.
+        $group_details = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']); //fetching the group details for the proview_disabled group.
+        
+        if( !empty($group_details) ) {
+            
+            $group_member = $DB->get_record('groups_members', ['groupid' => $group_details->id, 'userid'=> $USER->id]);//request to check blacklist.
 
-                if($group_details->name === 'proview_disabled') {
-                    $is_proctored =false;
-                }
-            }
-            if(!$is_proctored) {
+            if($group_member) {
                 return;
-            } 
+            }
         }
         //Logic for enabling specific user to use proctered assessment ENDS
         if (self::$injected) {
