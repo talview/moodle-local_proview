@@ -69,7 +69,7 @@ echo $OUTPUT->header();
           startProview(...event.data.args);
         }
 
-        if(event.data.type =='stopProview') {
+        if(event.data.type === 'stopProview') {
           stopProview(event.data.url)
         }
     //  }
