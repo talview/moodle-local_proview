@@ -34,9 +34,35 @@
 }}
 {{#js}}
     {{#enabled}}
+        function receiveMessage(event) {
+            if(event.data.type == 'startedProview') {
+                onProviewStart(...event.data.args);
+            }
+            if(event.data.type =='stoppedProview') {
+                onProviewStop()
+            }
+        }
+
+
+        function startProviewOnParent() {
+            //postMessage to parent window to start proview
+            parent.postMessage({type: 'startProview'},childOrigin);
+        }
+
+        function onProviewStart(err,id) {
+            console.log('Proview Started: PlayBackID - ' + id );
+        }
+        function onProviewStop(url) {
+            window.location.href = url;
+        }
         let current = window.location.href;
         let childOrigin = '*';  // can be location origin, replace with you domain
-        if(current.match('mod/quiz/(attempt|summary)') ){
+        if(current.match('mod/quiz/(attempt|summary)') ) {
+            $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
+                if( window.self != window.top) {
+                    parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+                }
+            })
             if( window.self == window.top) {
                 let params = new URLSearchParams({
                     url: current,
@@ -48,41 +74,11 @@
                 });
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             } else {
-
-                function receiveMessage(event) {
-                //  if (event.origin == childOrigin) {
-                    if(event.data.type == 'startedProview') {
-                      onProviewStart(...event.data.args);
-                    }
-
-                    if(event.data.type =='stoppedProview') {
-                      onProviewStop()
-                    }
-                  }
-                // }
                 window.addEventListener("message", receiveMessage, false);
-
-                function startProviewOnParent() {
-                  //postmessage to parent window to start proview
-                  parent.postMessage({type: 'startProview'},childOrigin);
-                }
-
-                function onProviewStart(err,id) {
-                  // alert('Proview Started: PlayBackID - ' + id );
-                }
-                $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
-                  parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
-                })
-
-                function onProviewStop(url) {
-                    window.location.href = url;
-                }
             }
         }
         if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
         }
-
     {{/enabled}}
-
 {{/js}}
