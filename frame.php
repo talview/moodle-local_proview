@@ -59,11 +59,11 @@ echo $OUTPUT->header();
     function receiveMessage(event) {
         console.log(event.data);
     //  if (event.origin == childOrigin) {
-        if(event.data.type === 'startProview') {
+        if(event.data.type == 'startProview') {
           startProview(...event.data.args);
         }
 
-        if(event.data.type === 'stopProview') {
+        if(event.data.type == 'stopProview') {
           stopProview(event.data.url)
         }
     //  }
@@ -108,7 +108,7 @@ echo $OUTPUT->header();
 
     function stopProview(url) {
       //Post message to application loaded into application on recording stop
-      if (window.ProviewStatus && window.ProviewStatus === 'start') {
+      if (window.ProviewStatus && window.ProviewStatus == 'start') {
         ProctorClient3.stop(function() {
             window.ProviewStatus = 'stop';
             document.getElementById('contentIFrame').contentWindow.postMessage({
