@@ -106,19 +106,21 @@ echo $OUTPUT->header();
 
     function stopProview(url) {
       //Post message to application loaded into application on recording stop
-      if (window.ProviewStatus && window.ProviewStatus == 'start') {
+      if ( window.ProviewStatus && window.ProviewStatus == 'start') {
         ProctorClient3.stop(function() {
             window.ProviewStatus = 'stop';
             document.getElementById('contentIFrame').contentWindow.postMessage({
                 type: 'stoppedProview',
                 url: url
             }, childOrigin);
+            window.location.href = url;
         });
       } else {
           document.getElementById('contentIFrame').contentWindow.postMessage({
               type: 'stoppedProview',
               url: url
           }, childOrigin);
+          window.location.href = url;
       }
     }
     (function() {
