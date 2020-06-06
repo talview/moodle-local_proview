@@ -54,18 +54,12 @@ echo $OUTPUT->header();
   <p>Your browser does not support iframes.</p>
 </iframe>
 <script>
-   var childOrigin = '*'; // can be location origin, replace with you domain
-    // Javascript self invoking function
-    // Take the query parameters from url and pass it to iframe as source
-    /* Explanation:
-      if parent URL is loaded as ?url=https://www.example.com/test/1
-      below defined function extact testurl(params) value and set it as source for iframe.
-     */
-
-    // Defining function for event handling on postmessage from any window
+   var childOrigin = '*';
+    // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
+        console.log(event.data);
     //  if (event.origin == childOrigin) {
-        if(event.data.type == 'startProview') {
+        if(event.data.type === 'startProview') {
           startProview(...event.data.args);
         }
 
@@ -75,14 +69,13 @@ echo $OUTPUT->header();
     //  }
     }
 
-    // Javascript event listener for window post message API (Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)
     window.addEventListener("message", receiveMessage, false);
     window.addEventListener('error', function(e) {
-      document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';//setting error page when error occured.
+      document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';//setting error page when error occurred.
     }, true);
 
 
-    //Javascript function to start proview invoked upon postmessage from iframe
+    //Javascript function to start proview invoked upon postMessage from iframe
     function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
       let url = proview_url || '//cdn.proview.io/init.js';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
@@ -91,14 +84,13 @@ echo $OUTPUT->header();
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script',url,'tv');
         tv('init', authToken,{
-
             session: session,
             clear: clear || true,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
         initCallback: onProviewStart
       });
-    };
+    }
 
     function onProviewStart(err, id) {
        window.ProviewStatus = 'start';
@@ -112,18 +104,23 @@ echo $OUTPUT->header();
           id     // Playback ID
         ]
       }, childOrigin);
-    };
+    }
 
     function stopProview(url) {
-      //Post message to application loaed into application on recording stop
-      if (window.ProviewStatus && window.ProviewStatus == 'start') {
+      //Post message to application loaded into application on recording stop
+      if (window.ProviewStatus && window.ProviewStatus === 'start') {
         ProctorClient3.stop(function() {
             window.ProviewStatus = 'stop';
             document.getElementById('contentIFrame').contentWindow.postMessage({
-                type: 'stoppedProview'
+                type: 'stoppedProview',
+                url: url
             }, childOrigin);
-            window.location.href = url;
-        })
+        });
+      } else {
+          document.getElementById('contentIFrame').contentWindow.postMessage({
+              type: 'stoppedProview',
+              url: url
+          }, childOrigin);
       }
     }
     (function() {

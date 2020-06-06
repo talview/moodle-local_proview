@@ -46,30 +46,33 @@ class injector {
      */
     public static function inject() {
         global $USER, $COURSE, $DB;
-        //Logic for enabling specific user to use proctered assessment STARTS
-        $group_details = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']); //fetching the group details for the proview_disabled group.
-        
-        if( !empty($group_details) ) {
-            
-            $group_member = $DB->get_record('groups_members', ['groupid' => $group_details->id, 'userid'=> $USER->id]);//request to check blacklist.
-
-            if($group_member) {
-                return;
-            }
-        }
-        //Logic for enabling specific user to use proctered assessment ENDS
-        if (self::$injected) {
-            return;
-        }
-        self::$injected = true;
-
 
         $enabled = get_config('local_proview', 'enabled');
         if (!$enabled) {
             return;
         }
+        if($COURSE && $COURSE->id) {
+            //Logic for enabling specific user to use proctored assessment STARTS
+            $group_details = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']); //fetching the group details for the proview_disabled group.
+
+            if( !empty($group_details) ) {
+
+                $group_member = $DB->get_record('groups_members', ['groupid' => $group_details->id, 'userid'=> $USER->id]);//request to check blacklist.
+
+                if($group_member) {
+                    return;
+                }
+            }
+            //Logic for enabling specific user to use proctored assessment ENDS
+            if (self::$injected) {
+                return;
+            }
+            self::$injected = true;
+        }
+
         $t = new api\tracker();
         $t::insert_tracking();
+        return ;
     }
 
     /**
@@ -79,5 +82,6 @@ class injector {
      */
     public static function reset() {
         self::$injected = false;
+        return ;
     }
 }

@@ -34,7 +34,7 @@ use local_proview\injector;
  *
  */
 function local_proview_before_standard_top_of_body_html() {
-    injector::inject();
+
 //    if(!headers_sent()){
 //        @header_remove('Feature-Policy');
 //        @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none'; camera: '*';");
@@ -50,5 +50,5 @@ function local_proview_before_http_headers() {
 }
 
 function local_proview_before_footer() {
-//    injector::inject();
+    injector::inject();
 }

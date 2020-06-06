@@ -74,13 +74,12 @@
                   parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
                 })
 
-                function onProviewStop() {
-
-                  // alert('Proview stopped');
+                function onProviewStop(url) {
+                    window.location.href = url;
                 }
             }
         }
-        if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ){
+        if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
         }
 
