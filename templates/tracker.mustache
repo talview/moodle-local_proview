@@ -39,7 +39,8 @@
                 onProviewStart(...event.data.args);
             }
             if(event.data.type =='stoppedProview') {
-                onProviewStop()
+                console.log(event.data.url);
+                onProviewStop(event.data.url);
             }
         }
 

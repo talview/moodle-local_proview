@@ -57,14 +57,13 @@ echo $OUTPUT->header();
    var childOrigin = '*';
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
-        console.log(event.data);
     //  if (event.origin == childOrigin) {
         if(event.data.type == 'startProview') {
-          startProview(...event.data.args);
+            startProview(...event.data.args);
         }
 
         if(event.data.type == 'stopProview') {
-          stopProview(event.data.url)
+            stopProview(event.data.url);
         }
     //  }
     }
