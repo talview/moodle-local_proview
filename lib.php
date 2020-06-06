@@ -33,7 +33,7 @@ use local_proview\injector;
  * Output callback, available since Moodle 3.3
  *
  */
-function local_proview_before_footer() {
+function local_proview_before_standard_top_of_body_html() {
     injector::inject();
 //    if(!headers_sent()){
 //        @header_remove('Feature-Policy');
@@ -45,6 +45,6 @@ function local_proview_before_footer() {
  * Output callback, available since Moodle 3.3
  *
  */
-function local_proview_before_http_headers() {
-    injector::inject();
-}
+//function local_proview_before_http_headers() {
+//    injector::inject();
+//}
