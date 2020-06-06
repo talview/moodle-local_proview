@@ -48,3 +48,7 @@ function local_proview_before_standard_top_of_body_html() {
 function local_proview_before_http_headers() {
 //    injector::inject();
 }
+
+function local_proview_before_footer() {
+//    injector::inject();
+}
