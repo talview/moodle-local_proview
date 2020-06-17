@@ -57,7 +57,7 @@
         }
         let current = window.location.href;
         let childOrigin = '*';  // can be location origin, replace with you domain
-        if(current.match('mod/quiz/(attempt|summary)') ) {
+        if(current.match('mod/quiz/(attempt|summary)')) {
             $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
                 if( window.self != window.top) {
                     parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
@@ -75,7 +75,34 @@
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
         }
-        if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ) {
+    
+       else if(current.match('mod/scorm/player.php')) {
+       //    else if(false) {
+            $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
+                if( window.self != window.top) {
+                    parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+                }
+            })
+            
+            if( window.self == window.top) {
+                let params = new URLSearchParams({
+                    url: current,
+                    token: '{{token}}',
+                    proview_url: '{{proview_url}}',
+                    clear: false,
+                    screen: false,
+                    profile: {{profile_id}},
+                    scorm_scoid: '{{scorm_scoid}}',
+                    scorm_cm: '{{scorm_cm}}',
+                    scorm_mode: '{{scorm_mode}}',
+                    scorm_currentorg: '{{scorm_currentorg}}'
+                });
+                console.log('{{root_dir}}');
+                window.location.href = '{{root_dir}}local/proview/scorm_frame.php?'+params.toString();
+            }
+        }
+        //debugger;
+        if((!(current.match('mod/quiz/(attempt|summary)')||current.match('mod/scorm/player'))) && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
         }
     {{/enabled}}
