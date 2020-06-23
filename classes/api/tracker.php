@@ -44,21 +44,9 @@ class tracker {
      */
     public static function insert_tracking() {
         global $PAGE, $OUTPUT, $USER;
-        // var_dump($PAGE->url->path,"/moodle/mod/scorm/player.php");
-        // var_dump($PAGE->url->params->scoid=="2");
-        // die();
-//         $class_name = get_class($PAGE->url);
-// $methods = get_class_methods($class_name);
-// foreach($methods as $method)
-// {
-//     var_dump($method);
-//     echo "<br>";
-// }
-        // var_dump($PAGE->url);
-        // var_dump($PAGE->url->get_param('scoid'));
+
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
-        var_dump($PAGE->requires->js_init_callback);
         $template->proview_url = get_config('local_proview', 'proview_url');
         $template->token = get_config('local_proview', 'token');
         $template->enabled = get_config('local_proview', 'enabled');
@@ -68,26 +56,7 @@ class tracker {
         $template->scorm_cm=$PAGE->url->get_param('cm');
         $template->scorm_mode=$PAGE->url->get_param('mode');
         $template->scorm_currentorg=$PAGE->url->get_param('currentorg');
-        $filecontent=file_get_contents ('stop_proview.txt');
-        $template->disable_proview=false;
-    //  if($filecontent)
-    //  {
-    //         var_dump($filecontent);
-    //         var_dump($filecontent=='STOP PROVIEW');
-    //         if($filecontent=='STOP PROVIEW'){
-    //             $template->disable_proview=true;
-    //             unlink('stop_proview.txt');
-    //         }
-    //  }
-        // $template->scorm_cm
-        // $template->checkUrl=$PAGE->url->path;
-        // $template->scorm_params=$PAGE->url->params;
-        // if ($PAGE->url->get_path()=="/moodle/mod/scorm/player.php") {
-        //     $template->is_scorm= true;
-        // }
-        // else{
-        //     $template->is_scorm= false;
-        // }
+        $template->course_id=$pageinfo[1]->id;
         if ($pageinfo && !empty($template->token)) {
             // The templates only contains a "{js}" block; so we don't care about
             // the output; only that the $PAGE->requires are filled.

@@ -55,6 +55,7 @@
         function onProviewStop(url) {
 
         }
+        const proview_status=localStorage.getItem('proview_status');
         let current = window.location.href;
         let childOrigin = '*';  // can be location origin, replace with you domain
         if(current.match('mod/quiz/(attempt|summary)')) {
@@ -75,15 +76,12 @@
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
         }
-    
-       else if(current.match('mod/scorm/player.php')) {
-       //    else if(false) {
+        if(current.match('mod/scorm/player.php')) {
             $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
                 if( window.self != window.top) {
                     parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
                 }
-            })
-            
+            })            
             if( window.self == window.top) {
                 let params = new URLSearchParams({
                     url: current,
@@ -98,12 +96,21 @@
                     scorm_currentorg: '{{scorm_currentorg}}'
                 });
                 console.log('{{root_dir}}');
-                window.location.href = '{{root_dir}}local/proview/scorm_frame.php?'+params.toString();
+                if(proview_status==='stopped')
+                {
+                    window.location.href='{{root_dir}}course/view.php?id={{course_id}}';
+                }
+                else{
+                    window.location.href = '{{root_dir}}local/proview/scorm_frame.php?'+params.toString();
+                }
             }
         }
-        //debugger;
+        else if(!current.match('mod/scorm/player.php')){
+            localStorage.removeItem('proview_status');
+        }
         if((!(current.match('mod/quiz/(attempt|summary)')||current.match('mod/scorm/player'))) && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+
         }
     {{/enabled}}
 {{/js}}

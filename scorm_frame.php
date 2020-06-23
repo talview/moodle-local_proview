@@ -50,7 +50,7 @@ echo $OUTPUT->header();
 
 ?>
 
-<form id="scormviewform" target='contentIFrame' method="post" hidden>
+<form id="scormviewform" target='contentIFrame' method="get" hidden>
   <input type="hidden" id='scorm_mode' name="mode" >
   <input type="hidden" id='scorm_scoid' name="scoid">
   <input type="hidden" id='scorm_cm' name="cm" >
@@ -66,7 +66,6 @@ echo $OUTPUT->header();
    var childOrigin = '*';
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
-      debugger;
     //  if (event.origin == childOrigin) {
         if(event.data.type == 'startProview') {
             startProview(...event.data.args);
@@ -105,7 +104,7 @@ echo $OUTPUT->header();
       //Post message to application loaded into application on recording start
       // document.getElementById('contentIFrame').src = window.iframeUrl ;
       // debugger;
-      document.getElementById('scorm_submit').click() ;
+      document.getElementById('scorm_submit').click();
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
       iframeWindow.postMessage({
         type: 'startedProview',
@@ -114,8 +113,19 @@ echo $OUTPUT->header();
           id     // Playback ID
         ]
       }, childOrigin);
+      document.getElementById("contentIFrame").addEventListener("load", onLoadContentFrame);
+
     }
-    
+    function onLoadContentFrame(){
+      let contentIFrame=document.getElementById("contentIFrame");
+      let contentIFrameDoc= contentIFrame.contentDocument? contentIFrame.contentDocument: contentIFrame.contentWindow.document;
+      contentIFrameDoc.getElementById("scorm_object").addEventListener("load", onLoadScormFrame);
+    }
+    function onLoadScormFrame(event){
+      localStorage.setItem("proview_status","stopped")
+      const stopUrl=document.getElementById("contentIFrame").contentWindow.location.href
+      stopProview(stopUrl);
+    }
     function stopProview(url) {
       //Post message to application loaded into application on recording stop
       if ( window.ProviewStatus && window.ProviewStatus == 'start') {
