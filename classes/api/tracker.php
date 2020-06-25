@@ -43,7 +43,9 @@ class tracker {
      * @return void As the insertion is done through the {js} template API.
      */
     public static function insert_tracking() {
-        global $PAGE, $OUTPUT, $USER;
+        global $PAGE, $OUTPUT, $USER, $DB;
+        $cm = $PAGE->cm;
+        $quiz = $DB->get_record('quiz', array('id' => $cm->instance));//fetching current quiz data for password.
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
         $template->proview_url = get_config('local_proview', 'proview_url');
@@ -51,6 +53,8 @@ class tracker {
         $template->enabled = get_config('local_proview', 'enabled');
         $template->root_dir = get_config('local_proview', 'root_dir');
         $template->profile_id = $USER->id;
+        $template->quiz_password = $quiz->password;
+        
         if ($pageinfo && !empty($template->token)) {
             // The templates only contains a "{js}" block; so we don't care about
             // the output; only that the $PAGE->requires are filled.

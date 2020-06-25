@@ -64,7 +64,6 @@ echo $OUTPUT->header();
         if(event.data.type == 'stopProview') {
             stopProview(event.data.url);
         }
-    //  }
     }
 
     window.addEventListener("message", receiveMessage, false);
@@ -76,7 +75,8 @@ echo $OUTPUT->header();
     //Javascript function to start proview invoked upon postMessage from iframe
     function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
       let url = proview_url || '//cdn.proview.io/init.js';
-      let iframeWindow = document.getElementById('contentIFrame').contentWindow;
+      document.getElementById('contentIFrame').src = window.iframeUrl;
+      //script to load the proview STARTS
       (function(i,s,o,g,r,a,m){i['TalviewProctor']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -91,10 +91,16 @@ echo $OUTPUT->header();
     }
 
     function onProviewStart(err, id) {
-       window.ProviewStatus = 'start';
-      //Post message to application loaded into application on recording start
-      document.getElementById('contentIFrame').src = window.iframeUrl ;
+      window.ProviewStatus = 'start';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
+
+      //Lock quiz logic STARTS
+      const button = iframeWindow.document.getElementById('id_quizpassword');
+      if( button ) { //checking if the password is enabled for the quiz or not
+        button.value = window.quizPassword; //fetching the password value from the window object
+        iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
+      }
+      //Lock quiz logic ENDS
       iframeWindow.postMessage({
         type: 'startedProview',
         args: [
@@ -126,6 +132,7 @@ echo $OUTPUT->header();
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
       window.iframeUrl = urlParams.get('url');
+      window.quizPassword = urlParams.get('quizPassword'); //setting quiz password
       startProview(urlParams.get('token'),urlParams.get('profile'),urlParams.get('proview_url'))
     })();
 </script>
