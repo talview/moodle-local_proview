@@ -93,13 +93,11 @@ echo $OUTPUT->header();
     function onProviewStart(err, id) {
       window.ProviewStatus = 'start';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
-
       //Lock quiz logic STARTS
-      const button = iframeWindow.document.getElementById('id_quizpassword');
-      if( button ) { //checking if the password is enabled for the quiz or not
-        button.value = window.quizPassword; //fetching the password value from the window object
-        iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
-      }
+      iframeWindow.postMessage({
+        "type"        : "proviewStarted",
+        "quizPassword": window.quizPassword
+      }, childOrigin);
       //Lock quiz logic ENDS
       iframeWindow.postMessage({
         type: 'startedProview',
