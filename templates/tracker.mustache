@@ -75,7 +75,13 @@
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
         }
-        if(current.match('mod/quiz/view') ) {
+        if(current.match('mod/quiz/(view)') ) {
+            if(window.parent.previousUrl) { //checking if the request is coming from summary
+              let previousUrl = window.parent.previousUrl;
+              if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ) {
+                 parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+              }
+            }
             let div = document.getElementsByClassName("singlebutton quizstartbuttondiv");
             div[0].getElementsByTagName("*")[3].addEventListener("click", function(event){
               $(".moodle-dialogue-base").hide();
@@ -92,6 +98,9 @@
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
             });
+        }
+        if(current.match('mod/quiz/(attempt|summary)')) {
+            window.parent.previousUrl = window.location.href;
         }
         if(!current.match('mod/quiz/(attempt|summary|startattempt|view)') && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
