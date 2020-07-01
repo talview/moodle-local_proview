@@ -68,7 +68,7 @@ echo $OUTPUT->header();
 
     window.addEventListener("message", receiveMessage, false);
     window.addEventListener('error', function(e) {
-      document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';//setting error page when error occurred.
+      console.error(e);
     }, false);
 
 
