@@ -69,7 +69,7 @@ echo $OUTPUT->header();
     window.addEventListener("message", receiveMessage, false);
     window.addEventListener('error', function(e) {
       document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';//setting error page when error occurred.
-    }, true);
+    }, false);
 
 
     //Javascript function to start proview invoked upon postMessage from iframe
@@ -99,6 +99,10 @@ echo $OUTPUT->header();
       if( button ) { //checking if the password is enabled for the quiz or not
         button.value = window.quizPassword; //fetching the password value from the window object
         iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
+      }
+      const id_submitbutton = iframeWindow.document.getElementById('id_submitbutton');
+      if( id_submitbutton ) { //handle if the test is timed quiz
+        id_submitbutton.click();//submitting the form
       }
       //Lock quiz logic ENDS
       iframeWindow.postMessage({
