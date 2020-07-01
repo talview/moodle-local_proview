@@ -27,6 +27,8 @@ namespace local_proview;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/pagelib.php');
+
 /**
  * Class injector
  *
@@ -45,7 +47,7 @@ class injector {
      * @return null
      */
     public static function inject() {
-        global $USER, $COURSE, $DB;
+        global $USER, $COURSE, $DB, $PAGE;
 
         $enabled = get_config('local_proview', 'enabled');
         if (!$enabled) {
@@ -60,6 +62,12 @@ class injector {
                 $group_member = $DB->get_record('groups_members', ['groupid' => $group_details->id, 'userid'=> $USER->id]);//request to check blacklist.
 
                 if($group_member) {
+                    $cm = $PAGE->cm;
+                    $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+                    
+                    if($quiz->password) { //if the quiz is password protected then inject the js
+                        $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
+                    }
                     return;
                 }
             }
