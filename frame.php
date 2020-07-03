@@ -53,8 +53,12 @@ echo $OUTPUT->header();
 <iframe id="contentIFrame" title="Iframe application" style="width: 98vw; height:95vh; border: 0px;">
   <p>Your browser does not support iframes.</p>
 </iframe>
+<script src="https://browser.sentry-cdn.com/5.18.1/bundle.min.js" integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" crossorigin="anonymous"></script>
 <script>
    var childOrigin = '*';
+   Sentry.init({
+     dsn: 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587'
+   });
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
     //  if (event.origin == childOrigin) {
@@ -67,9 +71,20 @@ echo $OUTPUT->header();
     }
 
     window.addEventListener("message", receiveMessage, false);
-    window.addEventListener('error', function(e) {
-      console.error(e);
+
+    window.parent.addEventListener('error', function(e) { //added event listner on parent
+      if (window.parent != window.top) {
+        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; //setting error page when error occurred.
+      }
     }, false);
+
+    window.addEventListener('error', function(error) { //added event listner on the window object which will listen for all the errors
+      if( error && error.error ) {
+        Sentry.captureException(error.error);
+      } else {
+        Sentry.captureException(error);
+      }
+    }, true);
 
 
     //Javascript function to start proview invoked upon postMessage from iframe
