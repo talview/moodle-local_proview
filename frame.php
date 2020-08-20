@@ -38,7 +38,7 @@ require_once('../../config.php');
 //require_once(__DIR__ . '/lib.php');
 
 // Globals.
-global $PAGE;
+global $PAGE, $COURSE;
 
 $PAGE->set_context(context_system::instance());
 
@@ -73,24 +73,26 @@ echo $OUTPUT->header();
 
 
     //Javascript function to start proview invoked upon postMessage from iframe
-    function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
+    function startProview(authToken, profileId, session, proview_url, skipHardwareTest, previewStyle, clear) {
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
-      //script to load the proview STARTS
+       //script to load the proview STARTS
       (function(i,s,o,g,r,a,m){i['TalviewProctor']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script',url,'tv');
         tv('init', authToken,{
+            profileId: profileId,
             session: session,
-            clear: clear || true,
+            clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-        initCallback: onProviewStart
+            initCallback: onProviewStart
       });
     }
 
     function onProviewStart(err, id) {
+      const urlParams = new URLSearchParams(window.location.search);
       window.ProviewStatus = 'start';
       let iframeWindow = document.getElementById('contentIFrame').contentWindow;
 
@@ -112,7 +114,44 @@ echo $OUTPUT->header();
           id     // Playback ID
         ]
       }, childOrigin);
+      
+      // Logic to insert attempt data in local_proview table STARTS
+      let url = urlParams.get('proview_url') || '//cdn.proview.io/init.js';
+      url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/':'https://app.proview.io/embedded/') + id;
+      const arr = {
+        "user_id"       : urlParams.get('profile'),
+        "quiz_id"       : urlParams.get('quizId'),
+        "course_id"     : '<?php echo $COURSE->id ?>',
+        "proview_url"   : url,
+      }
+      const xmlhttp = new XMLHttpRequest();
+      
+      // Logic to retry if attempt is not updated in quiz_attempts table STARTS
+      let retries=5;
+      function run(){
+        xmlhttp.onreadystatechange = function() {
+          if (xmlhttp.readyState === 4) {
+            console.log(xmlhttp.response);
+          }
+          if (xmlhttp.status == 404) {
+            if (retries > 0) {
+              retries-=1;
+              console.log(retries,": ",xmlhttp);
+              run();
+            } else if(xmlhttp.readyState === 4) {
+              console.log(retries,": ERROR!!");
+              throw new Error(xmlhttp.response);
+            }
+          }
+        }
+      // Logic to retry if attempt is not updated in quiz_attempts table ENDS
+      
+        xmlhttp.open("POST","datastore.php",true);
+        xmlhttp.send(JSON.stringify(arr));
+      }
+      run();
     }
+    // Logic to insert attempt data in local_proview table ENDS
 
     function stopProview(url) {
       //Post message to application loaded into application on recording stop
@@ -137,7 +176,7 @@ echo $OUTPUT->header();
       const urlParams = new URLSearchParams(window.location.search);
       window.iframeUrl = urlParams.get('url');
       window.quizPassword = urlParams.get('quizPassword'); //setting quiz password
-      startProview(urlParams.get('token'),urlParams.get('profile'),urlParams.get('proview_url'))
+      startProview(urlParams.get('token'), urlParams.get('profile'), urlParams.get('session'), urlParams.get('proview_url'));
     })();
 </script>
 

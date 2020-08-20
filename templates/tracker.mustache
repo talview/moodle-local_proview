@@ -70,7 +70,9 @@
                     proview_url: '{{proview_url}}',
                     clear: false,
                     screen: false,
-                    profile: {{profile_id}}
+                    profile: {{profile_id}},
+                    session: '{{quiz_id}}-{{current_attempt}}',
+                    quizId : '{{quiz_id}}'
                 });
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
@@ -87,18 +89,95 @@
               $(".moodle-dialogue-base").hide();
               if( window.self == window.top) {
                 let params = new URLSearchParams({
-                    url           : current,
-                    token         : '{{token}}',
-                    proview_url   : '{{proview_url}}',
-                    clear         : false,
-                    screen        : false,
-                    profile       : {{profile_id}},
-                    quizPassword  : {{#quiz_password}}'{{{quiz_password}}}'{{/quiz_password}}{{^quiz_password}}null{{/quiz_password}}
+                    url            : current,
+                    token          : '{{token}}',
+                    proview_url    : '{{proview_url}}',
+                    clear          : false,
+                    screen         : false,
+                    profile        : {{profile_id}},
+                    session        : '{{quiz_id}}-{{current_attempt}}',
+                    quizPassword   : {{#quiz_password}}'{{{quiz_password}}}'{{/quiz_password}}{{^quiz_password}}null{{/quiz_password}},
+                    quizId         : '{{quiz_id}}'
                 });
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
             });
         }
+
+        {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), STARTS }}
+        if(current.match('mod/quiz/report') ) {
+            let table = document.getElementById("attempts");
+            let thead = table.firstChild;
+            let tbody = table.lastChild;
+            let attempts = JSON.parse(`{{attempts}}`.replace(/&quot;/g,'"'));
+            let node = document.createElement("A");
+            node.setAttribute("href", "");
+
+            let parentNode = document.createElement("TH"); 
+            parentNode.setAttribute("scope", "col");
+            parentNode.setAttribute("class", `header c${thead.firstChild.children.length}`);
+
+            let textnode = document.createTextNode("Proview URL");
+
+            node.appendChild(textnode);   
+            parentNode.appendChild(node);
+            thead.firstChild.appendChild(parentNode);
+            for (let i = 0; i < tbody.children.length; i++) {
+                let attempt_id = tbody.children[i].firstChild.firstChild && tbody.children[i].firstChild.firstChild.value || null;
+                if(tbody.children[i].children.length == 1){                                     {{! Logic to handle last 2 rows of table and not append in hidden rows  }}
+                    tbody.children[i].firstChild.setAttribute("colspan",parseInt(tbody.children[i].firstChild.getAttribute('colspan'))+1);
+                    let emptyNode=document.createElement('TD');
+                    emptyNode.setAttribute("id", `mod-quiz-report-overview-report_r${i+1}_c${tbody.children[i+1].children.length}`);
+                    emptyNode.setAttribute("class", `cell c${tbody.children[i+1].children.length}`);
+                    tbody.children[i+1].appendChild(emptyNode);
+                    break;
+                }
+                textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||""); 
+
+                node = document.createElement("a");    
+                node.setAttribute("title", "Proview Link");
+                node.setAttribute("href", attempts[attempt_id]&&attempts[attempt_id].proview_url||"");
+                node.setAttribute("target", "proview");
+                node.addEventListener("click",()=>{                                             {{! Event to display I frame containing Proview admin }}
+                    table.setAttribute("style","display: none");
+                    modal.setAttribute("style","display: block");
+                })
+                node.appendChild(textnode);   
+
+                parentNode = document.createElement("TD");  
+                parentNode.setAttribute("id", `mod-quiz-report-overview-report_r${i}_c${tbody.children[i].children.length}`);
+                parentNode.setAttribute("class", `cell c${tbody.children[i].children.length}`);
+                parentNode.appendChild(node);                   
+                tbody.children[i].appendChild(parentNode);
+            }
+            {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), ENDS }}
+
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}   
+            var modal = document.createElement('div');
+            modal.setAttribute("id","modal");
+            modal.setAttribute("name","modal");
+            modal.setAttribute("style", "display: none;");
+            modal.setAttribute("align", "center");
+
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute("name", "proview");
+            iframe.setAttribute("style","height: 80vh; width: 100%;");
+
+            var close = document.createElement('div');
+            close.setAttribute("style","width: 100%;");
+            close.setAttribute("align","left");
+            close.innerHTML ='<span style="cursor: pointer">x</span>';
+            close.addEventListener("click", ()=>{
+                table.setAttribute("style","display: block");
+                modal.setAttribute("style","display: none");
+            });
+
+            modal.appendChild(close);
+            modal.appendChild(iframe);
+            table.parentNode.appendChild(modal);
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}   
+        }
+
         if(current.match('mod/quiz/(attempt|summary)') && window.self != window.top) {
             window.parent.previousUrl = window.location.href;
         }

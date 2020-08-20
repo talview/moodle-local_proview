@@ -36,7 +36,8 @@ defined('MOODLE_INTERNAL') || die();
 
 function xmldb_local_proview_upgrade($oldversion) {
     global $DB;
-
+    $dbman = $DB->get_manager();
+    
     if ($oldversion < 2020031901 ) {
         $options = array(
             'enabled'       => true,
@@ -54,5 +55,31 @@ function xmldb_local_proview_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2020031901, 'local', 'proview');
     }
+    
+    if ($oldversion < 2020081703) {
+
+        // Define table local_proview to be created.
+        $table = new xmldb_table('local_proview');
+
+        // Adding fields to table local_proview.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('quiz_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('proview_url', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('course_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('attempt_no', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table local_proview.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_proview.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Proview savepoint reached.
+        upgrade_plugin_savepoint(true, 2020081703, 'local', 'proview');
+    }
+
     return true;
 }
