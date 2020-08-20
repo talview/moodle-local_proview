@@ -46,6 +46,13 @@ class injector {
      *
      * @return null
      */
+
+    private static function inject_password($PAGE ,$quiz) {
+        if($quiz->password) { //if the quiz is password protected then inject the js
+            $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
+        }
+    }
+
     public static function inject() {
         global $USER, $COURSE, $DB, $PAGE;
 
@@ -53,6 +60,43 @@ class injector {
         if (!$enabled) {
             return;
         }
+
+        // Logic for enabling proview for course level and quiz level starts
+        $list = new \core_course_list_element($COURSE);   
+        $datas = $list->get_custom_fields();  
+        $course_level_configuration ;
+        foreach ($datas as $data) {
+            if (empty($data->get_value())) {
+                continue;
+            }
+            if(strpos(($data->get_field()->get('name')),"Proview Configuration") !== false) {
+                $course_level_configuration = $data->get_value();
+            }
+        }
+        $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+        switch ($course_level_configuration) {
+            case 1: break;                                                                  //Proview Enabled for complete course
+            case 2: if ($quiz && $quiz->id) {                                               //Proview Enabled for specific quizes
+                        if (!stripos (json_encode($quiz->name),"Proctor")){
+                            self::inject_password($PAGE, $quiz);
+                            return;
+                        }
+                    }
+                    break;
+            case 3: self::inject_password($PAGE, $quiz);
+                    return;                                                                 // Proview disabled for complete course
+                    break;
+            default:if ($quiz && $quiz->id) {                                               //If course level configuration is not enabled then Quiz level configuration is enabled by default
+                        if (!stripos (json_encode($quiz->name),"Proctor")){
+                            self::inject_password($PAGE, $quiz);
+                            return;
+                        }
+                    }
+                    break;
+        }      
+        // Logic for enabling proview for course level and quiz level ends
+
+
         if($COURSE && $COURSE->id) {
             //Logic for enabling specific user to use proctored assessment STARTS
             $group_details = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']); //fetching the group details for the proview_disabled group.
@@ -65,9 +109,7 @@ class injector {
                     $cm = $PAGE->cm;
                     $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
                     
-                    if($quiz->password) { //if the quiz is password protected then inject the js
-                        $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
-                    }
+                    self::inject_password($PAGE, $quiz);
                     return;
                 }
             }
