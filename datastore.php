@@ -38,7 +38,7 @@ require_once('../../config.php');
 // require_once(__DIR__ . '/lib.php');
 
 // Globals.
-global $DB, $_SERVER, $_GET;
+global $DB;
 
 $post = json_decode(file_get_contents('php://input'));
 
@@ -55,10 +55,10 @@ if($attempt && $attempt->id){
                         "attempt_no"=>$attempt->id
                     ]);
     
-    echo $response;
+    print $response;
     return; 
 }
 http_response_code(404);
-echo "Attempt not found";
+print "Attempt not found";
 
 ?>  
