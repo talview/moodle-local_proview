@@ -64,17 +64,17 @@ class injector {
         // Logic for enabling proview for course level and quiz level starts
         $list = new \core_course_list_element($COURSE);   
         $datas = $list->get_custom_fields();  
-        $course_level_configuration ;
+        $courseLevConfig ;                                                                  //Field for storing course level configuration
         foreach ($datas as $data) {
             if (empty($data->get_value())) {
                 continue;
             }
             if(strpos(($data->get_field()->get('name')),"Proview Configuration") !== false) {
-                $course_level_configuration = $data->get_value();
+                $courseLevConfig = $data->get_value();
             }
         }
         $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-        switch ($course_level_configuration) {
+        switch ($courseLevConfig) {
             case 1: break;                                                                  //Proview Enabled for complete course
             case 2: if ($quiz && $quiz->id) {                                               //Proview Enabled for specific quizes
                         if (!stripos (json_encode($quiz->name),"Proctor")){
