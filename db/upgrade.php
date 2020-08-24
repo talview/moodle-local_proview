@@ -56,18 +56,17 @@ function xmldb_local_proview_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020031901, 'local', 'proview');
     }
     
-    if ($oldversion < 2020081703) {
+    if ($oldversion < 2020082401) {
 
         // Define table local_proview to be created.
         $table = new xmldb_table('local_proview');
 
         // Adding fields to table local_proview.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('quiz_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('proview_url', XMLDB_TYPE_TEXT, null, null, null, null, null);
-        $table->add_field('course_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('attempt_no', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('quiz_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('proview_url', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('attempt_no', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table local_proview.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
@@ -78,7 +77,7 @@ function xmldb_local_proview_upgrade($oldversion) {
         }
 
         // Proview savepoint reached.
-        upgrade_plugin_savepoint(true, 2020081703, 'local', 'proview');
+        upgrade_plugin_savepoint(true, 2020082401, 'local', 'proview');
     }
 
     return true;

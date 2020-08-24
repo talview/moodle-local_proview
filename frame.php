@@ -145,7 +145,6 @@ echo $OUTPUT->header();
         const arr = {
           "user_id"       : urlParams.get('profile'),
           "quiz_id"       : urlParams.get('quizId'),
-          "course_id"     : '<?php print $COURSE->id ?>',
           "proview_url"   : url,
         }
         const xmlhttp = new XMLHttpRequest();

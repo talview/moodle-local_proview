@@ -50,7 +50,6 @@ if($attempt && $attempt->id){
     $response = $DB->insert_record('local_proview', [
                         "quiz_id"=>$post->quiz_id,
                         "proview_url"=>$post->proview_url,
-                        "course_id"=>$post->course_id,
                         "user_id"=>$post->user_id,
                         "attempt_no"=>$attempt->id
                     ]);
