@@ -46,6 +46,7 @@ class tracker {
         global $PAGE, $OUTPUT, $USER, $DB;
         $cm = $PAGE->cm;
         $quiz = $DB->get_record('quiz', array('id' => $cm->instance));//fetching current quiz data for password.
+            
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
         $template->proview_url = get_config('local_proview', 'proview_url');
@@ -54,7 +55,21 @@ class tracker {
         $template->root_dir = get_config('local_proview', 'root_dir');
         $template->profile_id = $USER->id;
         $template->quiz_password = $quiz->password;
+        $template->quiz_id = $quiz->id;
+        $attempt = $DB->get_record('quiz_attempts', array('quiz' => $quiz->id, 'userid' => $USER->id,'state' => 'inprogress'));
+        if (!$attempt) {
+            $attempts = $DB->get_records('quiz_attempts', array('quiz' => $quiz->id, 'userid' => $USER->id));
+            $attempt=  max(array_filter(array_column($attempts, 'attempt')));
+            $attempt+=1;
+        } else {
+            $attempt=$attempt->attempt;
+        }
+        $template->current_attempt=$attempt;
         
+        if (strpos($PAGE->url,('mod/quiz/report'))) {
+            $attempts = $DB->get_records('local_proview', array('quiz_id' => $quiz->id), 'attempt_no', 'attempt_no,proview_url');//fetching all the records (for proview url) for a given quiz.
+            $template->attempts = json_encode($attempts);
+        }
         if ($pageinfo && !empty($template->token)) {
             // The templates only contains a "{js}" block; so we don't care about
             // the output; only that the $PAGE->requires are filled.

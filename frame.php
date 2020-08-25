@@ -38,7 +38,7 @@ require_once('../../config.php');
 //require_once(__DIR__ . '/lib.php');
 
 // Globals.
-global $PAGE;
+global $PAGE, $COURSE;
 
 $PAGE->set_context(context_system::instance());
 
@@ -62,33 +62,42 @@ echo $OUTPUT->header();
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
     //  if (event.origin == childOrigin) {
+      try {
         if(event.data.type == 'startProview') {
             startProview(...event.data.args);
         }
         if(event.data.type == 'stopProview') {
             stopProview(event.data.url);
+        }       
+      } catch (error) {
+        if( error && error.error ) {
+          Sentry.captureException(error.error);
+        } else {
+          Sentry.captureException(error);
         }
+        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; 
+      }
     }
 
     window.addEventListener("message", receiveMessage, false);
 
-    window.parent.addEventListener('error', function(e) { //added event listner on parent
-      if (window.parent != window.top) {
-        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; //setting error page when error occurred.
-      }
-    }, false);
+    // window.parent.addEventListener('error', function(e) { //added event listner on parent
+    //   if (window.parent != window.top) {
+    //     document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; //setting error page when error occurred.
+    //   }
+    // }, false);
 
-    window.addEventListener('error', function(error) { //added event listner on the window object which will listen for all the errors
-      if( error && error.error ) {
-        Sentry.captureException(error.error);
-      } else {
-        Sentry.captureException(error);
-      }
-    }, true);
+    // window.addEventListener('error', function(error) { //added event listner on the window object which will listen for all the errors
+    //   if( error && error.error ) {
+    //     Sentry.captureException(error.error);
+    //   } else {
+    //     Sentry.captureException(error);
+    //   }
+    // }, true);
 
 
     //Javascript function to start proview invoked upon postMessage from iframe
-    function startProview(authToken, session, proview_url, clear, skipHardwareTest, previewStyle) {
+    function startProview(authToken, profileId, session, proview_url, skipHardwareTest, previewStyle, clear) {
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
@@ -97,36 +106,79 @@ echo $OUTPUT->header();
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script',url,'tv');
         tv('init', authToken,{
+            profileId: profileId,
             session: session,
-            clear: clear || true,
+            clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-        initCallback: onProviewStart
+            initCallback: onProviewStart
       });
     }
 
     function onProviewStart(err, id) {
-      window.ProviewStatus = 'start';
-      let iframeWindow = document.getElementById('contentIFrame').contentWindow;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        window.ProviewStatus = 'start';
+        let iframeWindow = document.getElementById('contentIFrame').contentWindow;
 
-      //Lock quiz logic STARTS
-      const button = iframeWindow.document.getElementById('id_quizpassword');
-      if( button ) { //checking if the password is enabled for the quiz or not
-        button.value = window.quizPassword; //fetching the password value from the window object
-        iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
+        //Lock quiz logic STARTS
+        const button = iframeWindow.document.getElementById('id_quizpassword');
+        if( button ) { //checking if the password is enabled for the quiz or not
+          button.value = window.quizPassword; //fetching the password value from the window object
+          iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
+        }
+        const id_submitbutton = iframeWindow.document.getElementById('id_submitbutton');
+        if( id_submitbutton ) { //handle if the test is timed quiz
+          id_submitbutton.click();//submitting the form
+        }
+        //Lock quiz logic ENDS
+        iframeWindow.postMessage({
+          type: 'startedProview',
+          args: [
+            err,   //Error on proview stating, if any
+            id     // Playback ID
+          ]
+        }, childOrigin);
+        
+        let url = urlParams.get('proview_url') || '//cdn.proview.io/init.js';
+        url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/':'https://app.proview.io/embedded/') + id;
+        const arr = {
+          "user_id"       : urlParams.get('profile'),
+          "quiz_id"       : urlParams.get('quizId'),
+          "proview_url"   : url,
+        }
+        const xmlhttp = new XMLHttpRequest();
+        
+        let retries=5;
+        function run(){
+          xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState === 4) {
+              // console.log(xmlhttp.response);
+            }
+            if (xmlhttp.status == 404) {
+              if (retries > 0) {
+                retries-=1;
+                // console.log(retries,": ",xmlhttp);
+                run();
+              } else if(xmlhttp.readyState === 4) {
+                // console.log(retries,": ERROR!!");
+                Sentry.captureException(new Error(xmlhttp.response));
+              }
+            }
+          }
+          xmlhttp.open("POST","datastore.php",true);
+          xmlhttp.send(JSON.stringify(arr));
+        }
+        run();
+      } catch (error) {
+        console.log("Enter catch")
+        if( error && error.error ) {
+          Sentry.captureException(error.error);
+        } else {
+          Sentry.captureException(error);
+        }
+        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; 
       }
-      const id_submitbutton = iframeWindow.document.getElementById('id_submitbutton');
-      if( id_submitbutton ) { //handle if the test is timed quiz
-        id_submitbutton.click();//submitting the form
-      }
-      //Lock quiz logic ENDS
-      iframeWindow.postMessage({
-        type: 'startedProview',
-        args: [
-          err,   //Error on proview stating, if any
-          id     // Playback ID
-        ]
-      }, childOrigin);
     }
 
     function stopProview(url) {
@@ -149,10 +201,19 @@ echo $OUTPUT->header();
       }
     }
     (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      window.iframeUrl = urlParams.get('url');
-      window.quizPassword = urlParams.get('quizPassword'); //setting quiz password
-      startProview(urlParams.get('token'),urlParams.get('profile'),urlParams.get('proview_url'))
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        window.iframeUrl = urlParams.get('url');
+        window.quizPassword = urlParams.get('quizPassword'); //setting quiz password
+        startProview(urlParams.get('token'), urlParams.get('profile'), urlParams.get('session'), urlParams.get('proview_url'));
+      } catch (error) {
+        if( error && error.error ) {
+          Sentry.captureException(error.error);
+        } else {
+          Sentry.captureException(error);
+        }
+        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; 
+      }
     })();
 </script>
 
