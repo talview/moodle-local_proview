@@ -21,7 +21,7 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Mani Ka <mani@talview.com>
+ * @author     Talview Inc.  (Author to be changed in each and every file to Talview Inc.)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ $string['pluginname'] = 'Proview';
 $string['proview_url'] = 'Proview Endpoint URL';
 $string['proview_url_desc'] = 'Enter the Proview End point URL ';
 $string['token'] = 'Proview Token';
-$string['token_desc'] = 'For example: U12345678';
+$string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
 $string['root_dir'] = 'Root Dir';
