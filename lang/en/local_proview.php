@@ -21,7 +21,7 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Talview Inc.  (Author to be changed in each and every file to Talview Inc.)
+ * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
