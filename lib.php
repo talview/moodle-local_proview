@@ -21,7 +21,7 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Mani Ka <mani@talview.com>
+ * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

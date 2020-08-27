@@ -18,7 +18,7 @@
  * Class injector
  *
  * @package     local_proview
- * @author      Mani Ka <mani@talview.com>
+ * @author      Talview Inc.
  * @copyright   2020 Talview Inc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ require_once($CFG->libdir . '/pagelib.php');
  * Class injector
  *
  * @package     local_proview
- * @author      Mani Ka <mani@talview.com>
+ * @author      Talview Inc.
  * @copyright   2020 Talview Inc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
