@@ -28,6 +28,8 @@ namespace local_proview;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/pagelib.php');
+require_once($CFG->dirroot . '/local/proview/vendor/autoload.php');
+\Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587' ]);
 
 /**
  * Class injector
@@ -124,8 +126,15 @@ class injector {
             $t = new api\tracker();
             $t::insert_tracking();
             return ;
-        } catch (Exception $error){
-            self::inject_password($PAGE, $quiz);
+        } catch (\Throwable $error){
+            \Sentry\captureException($error);
+            ?>
+            <script>
+                document.body.style.margin='0px';
+                document.body.innerHTML=`<iframe id="errorIFrame" src='https://pages.talview.com/proview/error/index.html' title="Proview Error" style="width: 100%; height:100%; border: 0px;"><p>Your browser does not support iframes</p></iframe>`;
+            </script>
+            <?php 
+            die;
         }
     }
 

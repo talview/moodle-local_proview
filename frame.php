@@ -161,7 +161,11 @@ echo $OUTPUT->header();
                 // console.log(retries,": ",xmlhttp);
                 run();
               } else if(xmlhttp.readyState === 4) {
-                // console.log(retries,": ERROR!!");
+                ProctorClient3.stop(function() {
+                  window.ProviewStatus = 'stop';
+                });
+                document.body.style.margin='0px';
+                document.body.innerHTML=`<iframe id="errorIFrame" src='https://pages.talview.com/proview/error/index.html' title="Proview Error" style="width: 100vw; height:99vh; border: 0px;"><p>Your browser does not support iframes</p></iframe>`;
                 Sentry.captureException(new Error(xmlhttp.response));
               }
             }
