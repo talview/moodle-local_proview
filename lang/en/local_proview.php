@@ -35,7 +35,7 @@ $string['enabled_desc'] = 'Enable Proview for Moodle';
 $string['root_dir'] = 'Root Dir';
 $string['root_dir_desc'] = 'Root Dir';
 
-// /*
-//  * GDPR compliant
-//  */
+/*
+ * GDPR compliant
+ */
 // $string['privacy:no_data_reason'] = "The local analytics plugin doesn't store any personal data.";

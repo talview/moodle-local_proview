@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_local_proview_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
-    
+
     if ($oldversion < 2020031901 ) {
         $options = array(
             'enabled'       => true,
@@ -45,7 +45,7 @@ function xmldb_local_proview_upgrade($oldversion) {
             'proview_url'   => '//cdn.proview.io/init.js',
             'root_dir'      => '/'
         );
-        foreach ($options as $key => $value ) {
+        foreach ($options as $key => $value) {
             $new = new stdClass();
             $new->plugin = 'local_proview';
             $new->name = $key;
@@ -55,7 +55,7 @@ function xmldb_local_proview_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2020031901, 'local', 'proview');
     }
-    
+
     if ($oldversion < 2020082401) {
 
         // Define table local_proview to be created.

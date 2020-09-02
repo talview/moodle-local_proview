@@ -47,8 +47,8 @@ class injector {
      * @return null
      */
 
-    private static function inject_password($PAGE ,$quiz) {
-        if($quiz->password) { //if the quiz is password protected then inject the js
+    private static function inject_password($PAGE, $quiz) {
+        if ($quiz->password) {                          // If the quiz is password protected then inject the js.
             $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
         }
     }
@@ -61,60 +61,64 @@ class injector {
             return;
         }
 
-        // Logic for enabling proview for course level and quiz level starts
+        // Logic for enabling proview for course level and quiz level starts.
         try {
-            $list = new \core_course_list_element($COURSE);   
-            $datas = $list->get_custom_fields();  
-            $courseLevConfig ;                                                                  //Field for storing course level configuration
+            $list = new \core_course_list_element($COURSE);
+            $datas = $list->get_custom_fields();
+            $courselevelconfiguration;                   // Field for storing course level configuration.
             foreach ($datas as $data) {
                 if (empty($data->get_value())) {
                     continue;
                 }
-                if(strpos(($data->get_field()->get('name')),"Proview Configuration") !== false) {
-                    $courseLevConfig = $data->get_value();
+                if (strpos(($data->get_field()->get('name')), "Proview Configuration") !== false) {
+                    $courselevelconfiguration = $data->get_value();
                 }
             }
             $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-            switch ($courseLevConfig) {
-                case 1: break;                                                                  //Proview Enabled for complete course
-                case 2: if ($quiz && $quiz->id) {                                               //Proview Enabled for specific quizes
-                            if (!stripos (json_encode($quiz->name),"Proctor")){
-                                self::inject_password($PAGE, $quiz);
-                                return;
-                            }
+            switch ($courselevelconfiguration) {
+                case 1:          // Proview Enabled for complete course.
+                    break;
+                case 2:          // Proview Enabled for specific quizes.
+                    if ($quiz && $quiz->id) {
+                        if (!stripos (json_encode($quiz->name), "Proctor")) {
+                            self::inject_password($PAGE, $quiz);
+                            return;
                         }
-                        break;
-                case 3: self::inject_password($PAGE, $quiz);
-                        return;                                                                 // Proview disabled for complete course
-                        break;
-                default:if ($quiz && $quiz->id) {                                               //If course level configuration is not enabled then Quiz level configuration is enabled by default
-                            if (!stripos (json_encode($quiz->name),"Proctor")){
-                                self::inject_password($PAGE, $quiz);
-                                return;
-                            }
+                    }
+                    break;
+                case 3:         // Proview disabled for complete course.
+                    self::inject_password($PAGE, $quiz);
+                    return;
+                    break;
+                default:        // If course level configuration is not enabled then Quiz level configuration is enabled by default.
+                    if ($quiz && $quiz->id) {
+                        if (!stripos (json_encode($quiz->name), "Proctor")) {
+                            self::inject_password($PAGE, $quiz);
+                            return;
                         }
-                        break;
-            }      
-            // Logic for enabling proview for course level and quiz level ends
+                    }
+                    break;
+            }
+            // Logic for enabling proview for course level and quiz level ends.
 
+            if ($COURSE && $COURSE->id) {
+                // Logic for enabling specific user to use proctored assessment STARTS
+                // Fetching the group details for the proview_disabled group.
+                $groupdetails = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']);
 
-            if($COURSE && $COURSE->id) {
-                //Logic for enabling specific user to use proctored assessment STARTS
-                $group_details = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']); //fetching the group details for the proview_disabled group.
+                if (!empty($groupdetails)) {
 
-                if( !empty($group_details) ) {
+                    $groupmember = $DB->get_record('groups_members', ['groupid' => $groupdetails->id, 'userid' => $USER->id]);// Request to check blacklist.
 
-                    $group_member = $DB->get_record('groups_members', ['groupid' => $group_details->id, 'userid'=> $USER->id]);//request to check blacklist.
-
-                    if($group_member) {
+                    if ($groupmember) {
                         $cm = $PAGE->cm;
                         $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
-                        
+
                         self::inject_password($PAGE, $quiz);
                         return;
                     }
                 }
-                //Logic for enabling specific user to use proctored assessment ENDS
+                // Logic for enabling specific user to use proctored assessment ENDS.
                 if (self::$injected) {
                     return;
                 }
@@ -123,8 +127,8 @@ class injector {
 
             $t = new api\tracker();
             $t::insert_tracking();
-            return ;
-        } catch (Exception $error){
+            return;
+        } catch (Exception $error) {
             self::inject_password($PAGE, $quiz);
         }
     }
@@ -136,6 +140,6 @@ class injector {
      */
     public static function reset() {
         self::$injected = false;
-        return ;
+        return;
     }
 }

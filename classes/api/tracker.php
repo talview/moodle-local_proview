@@ -45,8 +45,8 @@ class tracker {
     public static function insert_tracking() {
         global $PAGE, $OUTPUT, $USER, $DB;
         $cm = $PAGE->cm;
-        $quiz = $DB->get_record('quiz', array('id' => $cm->instance));//fetching current quiz data for password.
-            
+        $quiz = $DB->get_record('quiz', array('id' => $cm->instance));      // Fetching current quiz data for password.
+
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
         $template->proview_url = get_config('local_proview', 'proview_url');
@@ -56,18 +56,18 @@ class tracker {
         $template->profile_id = $USER->id;
         $template->quiz_password = $quiz->password;
         $template->quiz_id = $quiz->id;
-        $attempt = $DB->get_record('quiz_attempts', array('quiz' => $quiz->id, 'userid' => $USER->id,'state' => 'inprogress'));
+        $attempt = $DB->get_record('quiz_attempts', array('quiz' => $quiz->id, 'userid' => $USER->id, 'state' => 'inprogress'));
         if (!$attempt) {
             $attempts = $DB->get_records('quiz_attempts', array('quiz' => $quiz->id, 'userid' => $USER->id));
-            $attempt=  max(array_filter(array_column($attempts, 'attempt')));
-            $attempt+=1;
+            $attempt = max(array_filter(array_column($attempts, 'attempt')));
+            $attempt += 1;
         } else {
-            $attempt=$attempt->attempt;
+            $attempt = $attempt->attempt;
         }
-        $template->current_attempt=$attempt;
-        
-        if (strpos($PAGE->url,('mod/quiz/report'))) {
-            $attempts = $DB->get_records('local_proview', array('quiz_id' => $quiz->id), 'attempt_no', 'attempt_no,proview_url');//fetching all the records (for proview url) for a given quiz.
+        $template->current_attempt = $attempt;
+
+        if (strpos($PAGE->url, ('mod/quiz/report'))) {
+            $attempts = $DB->get_records('local_proview', array('quiz_id' => $quiz->id), 'attempt_no', 'attempt_no,proview_url');   // Fetching all the records (for proview url) for a given quiz.
             $template->attempts = json_encode($attempts);
         }
         if ($pageinfo && !empty($template->token)) {

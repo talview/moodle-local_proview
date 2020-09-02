@@ -53,7 +53,10 @@ echo $OUTPUT->header();
 <iframe id="contentIFrame" title="Iframe application" style="width: 98vw; height:95vh; border: 0px;">
   <p>Your browser does not support iframes.</p>
 </iframe>
-<script src="https://browser.sentry-cdn.com/5.18.1/bundle.min.js" integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" crossorigin="anonymous"></script>
+<script src="https://browser.sentry-cdn.com/5.18.1/bundle.min.js" 
+        integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" 
+        crossorigin="anonymous">
+</script>
 <script>
    var childOrigin = '*';
    Sentry.init({
