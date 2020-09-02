@@ -25,17 +25,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//require_login();
-
 // Include config.php.
 // @codingStandardsIgnoreStart
 // Let codechecker ignore the next line because otherwise it would complain about a missing login check
 // after requiring config.php which is really not needed.
 require_once('../../config.php');
 // @codingStandardsIgnoreEnd
-
-// Include lib.php.
-// require_once(__DIR__ . '/lib.php');
 
 // Globals.
 global $DB;
@@ -44,7 +39,7 @@ $post = json_decode(file_get_contents('php://input'));
 
 $attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
 
-if($attempt && $attempt->id){
+if ($attempt && $attempt->id) {
     // Inserting attempt data in local_proview table.
     $response = $DB->insert_record('local_proview', [
                         "quiz_id" => $post->quiz_id,

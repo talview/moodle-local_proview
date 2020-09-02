@@ -25,17 +25,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//require_login();
-
 // Include config.php.
 // @codingStandardsIgnoreStart
 // Let codechecker ignore the next line because otherwise it would complain about a missing login check
 // after requiring config.php which is really not needed.
 require_once('../../config.php');
 // @codingStandardsIgnoreEnd
-
-// Include lib.php.
-//require_once(__DIR__ . '/lib.php');
 
 // Globals.
 global $PAGE, $COURSE;
@@ -64,7 +59,6 @@ echo $OUTPUT->header();
    });
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
-    //  if (event.origin == childOrigin) {
       try {
         if(event.data.type == 'startProview') {
             startProview(...event.data.args);
@@ -83,21 +77,6 @@ echo $OUTPUT->header();
     }
 
     window.addEventListener("message", receiveMessage, false);
-
-    // window.parent.addEventListener('error', function(e) { //added event listner on parent
-    //   if (window.parent != window.top) {
-    //     document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; //setting error page when error occurred.
-    //   }
-    // }, false);
-
-    // window.addEventListener('error', function(error) { //added event listner on the window object which will listen for all the errors
-    //   if( error && error.error ) {
-    //     Sentry.captureException(error.error);
-    //   } else {
-    //     Sentry.captureException(error);
-    //   }
-    // }, true);
-
 
     //Javascript function to start proview invoked upon postMessage from iframe
     function startProview(authToken, profileId, session, proview_url, skipHardwareTest, previewStyle, clear) {
@@ -156,15 +135,12 @@ echo $OUTPUT->header();
         function run(){
           xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState === 4) {
-              // console.log(xmlhttp.response);
             }
             if (xmlhttp.status == 404) {
               if (retries > 0) {
                 retries-=1;
-                // console.log(retries,": ",xmlhttp);
                 run();
               } else if(xmlhttp.readyState === 4) {
-                // console.log(retries,": ERROR!!");
                 Sentry.captureException(new Error(xmlhttp.response));
               }
             }
