@@ -144,8 +144,15 @@ echo $OUTPUT->header();
                 ProctorClient3.stop(function() {
                   window.ProviewStatus = 'stop';
                 });
-                document.body.style.margin='0px';
-                document.body.innerHTML=`<iframe id="errorIFrame" src='https://pages.talview.com/proview/error/index.html' title="Proview Error" style="width: 100vw; height:99vh; border: 0px;"><p>Your browser does not support iframes</p></iframe>`;
+                document.body.style.margin = '0px';
+                document.body.innerHTML = `<iframe id="errorIFrame"
+                        src='https://pages.talview.com/proview/error/index.html'
+                        title="Proview Error"
+                        style="width: 100%;
+                        height:100%;
+                        border: 0px;">
+                    <p>Your browser does not support iframes</p>
+                </iframe>`;
                 Sentry.captureException(new Error(xmlhttp.response));
               }
             }

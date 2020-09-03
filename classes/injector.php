@@ -129,15 +129,23 @@ class injector {
 
             $t = new api\tracker();
             $t::insert_tracking();
-            return ;
-        } catch (\Throwable $error){
+            return;
+        } catch (\Throwable $error) {
             \Sentry\captureException($error);
+            die;
             ?>
             <script>
-                document.body.style.margin='0px';
-                document.body.innerHTML=`<iframe id="errorIFrame" src='https://pages.talview.com/proview/error/index.html' title="Proview Error" style="width: 100%; height:100%; border: 0px;"><p>Your browser does not support iframes</p></iframe>`;
+                document.body.style.margin = '0px';
+                document.body.innerHTML = `<iframe id="errorIFrame"
+                        src='https://pages.talview.com/proview/error/index.html'
+                        title="Proview Error"
+                        style="width: 100%;
+                        height:100%;
+                        border: 0px;">
+                    <p>Your browser does not support iframes</p>
+                </iframe>`;
             </script>
-            <?php 
+            <?php
             die;
         }
     }
