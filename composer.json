@@ -1,8 +1,10 @@
 {
     "name": "talview/moodle-local_proview",
     "type": "moodle-local",
+    "description":"Plugin to enable Talview's Proview proctoring solution on Moodle.",
     "require": {
-        "composer/installers": "~1.0"
+        "composer/installers": "~1.0",
+        "sentry/sdk": "^2.1"
     },
     "extra": {
         "installer-name": "proview"
