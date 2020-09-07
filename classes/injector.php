@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/pagelib.php');
 require_once($CFG->dirroot . '/local/proview/vendor/autoload.php');
-\Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587' ]);
 
 /**
  * Class injector
@@ -76,30 +75,32 @@ class injector {
                     $courselevelconfiguration = $data->get_value();
                 }
             }
-            $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-            switch ($courselevelconfiguration) {
-                case 1:          // Proview Enabled for complete course.
-                    break;
-                case 2:          // Proview Enabled for specific quizes.
-                    if ($quiz && $quiz->id) {
-                        if (!stripos (json_encode($quiz->name), "Proctor")) {
-                            self::inject_password($PAGE, $quiz);
-                            return;
+            if ($PAGE->cm) {
+                $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+                switch ($courselevelconfiguration) {
+                    case 1:      // Proview Enabled for complete course.
+                        break;
+                    case 2:      // Proview Enabled for specific quizes.
+                        if ($quiz && $quiz->id) {
+                            if (!stripos (json_encode($quiz->name), "Proctor")) {
+                                self::inject_password($PAGE, $quiz);
+                                return;
+                            }
                         }
-                    }
-                    break;
-                case 3:         // Proview disabled for complete course.
-                    self::inject_password($PAGE, $quiz);
-                    return;
-                    break;
-                default:        // If course level configuration is not enabled then Quiz level configuration is enabled by default.
-                    if ($quiz && $quiz->id) {
-                        if (!stripos (json_encode($quiz->name), "Proctor")) {
-                            self::inject_password($PAGE, $quiz);
-                            return;
+                        break;
+                    case 3:     // Proview disabled for complete course.
+                        self::inject_password($PAGE, $quiz);
+                        return;
+                        break;
+                    default:    // If course level configuration is not enabled then Quiz level configuration is enabled by default.
+                        if ($quiz && $quiz->id) {
+                            if (!stripos (json_encode($quiz->name), "Proctor")) {
+                                self::inject_password($PAGE, $quiz);
+                                return;
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
             // Logic for enabling proview for course level and quiz level ends.
 
@@ -131,6 +132,7 @@ class injector {
             $t::insert_tracking();
             return;
         } catch (\Throwable $error) {
+            \Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587' ]);
             \Sentry\captureException($error);
             die;
             ?>
