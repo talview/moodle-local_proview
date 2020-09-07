@@ -25,12 +25,28 @@
     * none
 
     Context variables required for this template:
+    * enabled Boolean value defining Proview is enabled or not
     * token Proview token code
     * proview_url Plugin url
-    * session_id Session ID to track and map sessions with
+    * profile_id User Id of the candidate
+    * quiz_id Quiz Id of the Quiz
+    * current_attempt current Attempt no of the candidate for that quiz Eg: 1 for first attempt, 2 for second attempt.
+    * root_dir Root Directory of moodle installation
+    * quiz_password Quiz password if the quiz is password protected else null
+    * attempts All the records from local_proview table for a given quiz with attempt no as ket
 
     Example context (json):
-    { “token”: token123, “proview_url”: <Will contain the URL required for launching proview>,'session_id’: “session_uid_12312” }
+    {
+        "enabled": true,
+        “token”: "token123",
+        “proview_url”: <Will contain the URL required for launching proview/ Plugin Url>,
+        "profile_id": 1,
+        "quiz_id": 1,
+        "current_attempt": 1,
+        "root_dir": /moodle/,
+        "quiz_password": "pass123",
+        "attempts": {"85":{"attempt_no":"85","proview_url":"https:\/\/www.google.com"} }
+    }
 }}
 {{#js}}
     {{#enabled}}

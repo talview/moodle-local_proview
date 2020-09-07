@@ -37,6 +37,7 @@ require_once($CFG->dirroot . '/local/proview/vendor/autoload.php');
  * @author      Talview Inc.
  * @copyright   2020 Talview Inc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses        die
  */
 class injector {
     /** @var bool Keeps state for injection */

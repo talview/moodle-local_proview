@@ -23,6 +23,7 @@
  * @copyright  Talview, 2020
  * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses       die
  */
 
 namespace local_proview\api;
