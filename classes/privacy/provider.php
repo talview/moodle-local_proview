@@ -29,6 +29,7 @@ use \core_privacy\local\metadata\collection;
 use \core_privacy\local\request\writer;
 use \core_privacy\local\request\approved_contextlist;
 use \core_privacy\local\request\contextlist;
+use stdClass;
 
 if (interface_exists('\core_privacy\local\request\userlist')) {
     interface my_userlist extends \core_privacy\local\request\userlist{
@@ -115,8 +116,6 @@ class provider implements
      * @return  contextlist   $contextlist  The list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid) : contextlist {
-        echo("Proview");
-        var_dump($userid);
         // Fetch all forum discussions, and forum posts.
         $sql = "SELECT c.id
                     FROM {context} c
@@ -153,13 +152,11 @@ class provider implements
         $user = $contextlist->get_user();
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-        echo ("SQL");
-        var_dump($contextsql);
         $sql = "SELECT lp.id,
                        lp.user_id,
                        lp.quiz_id,
                        lp.attempt_no,
-                       lp.proview_url
+                       c.id as context_id
                   FROM {local_proview} lp
                   JOIN {quiz} q ON lp.quiz_id = q.id
                   JOIN {course_modules} cm ON q.id = cm.instance
@@ -170,10 +167,14 @@ class provider implements
         $params = [
             'userid' => $user->id,
         ] + $contextparams;
-        $lpmap = $DB->get_recordset_sql($sql, $params);
+        $lpmap = $DB->get_records_sql($sql, $params);
         foreach ($contextlist->get_contexts() as $context) {
-            writer::with_context($context)
-                ->export_data(["Proview"], $lpmap);
+            foreach ($lpmap as $lpmapstd) {
+                if ($lpmapstd->context_id == $context->id) {
+                    writer::with_context($context)
+                        ->export_data(["Proview"], $lpmapstd);
+                }
+            }
         }
     }
 
