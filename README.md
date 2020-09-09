@@ -23,8 +23,7 @@ This plugin is developed by the team at Talview Inc and implements “Proview”
 
     -   Enter the cdn provided by Talview (subscription based).
 
-    -  Change the root_dir to root directory of your moodle installation.</br>
-
+    -   Change the root_dir to root directory of your moodle installation.</br>
     *(Root directory is the directory where moodle is installed. If you can access moodle with a URL like this '<https://example.domain.com/>' then the directory is '/' and no configuration is required. If you access moodle with a URL like '<https://example.domain.com/moodle/>' then '/moodle/' is the root directory and the same needs to be configured in the root_dir field when installing proview.)*
 
 -   Installation Completed.
