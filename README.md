@@ -18,9 +18,13 @@ This plugin is developed by the team at Talview Inc and implements “Proview”
 
 -   “On the plugin settings page”
     -   Click on Checkbox to enable Proview (Default Disabled).
+
     -   Enter the User Token shared by Talview (subscription based).
+
     -   Enter the cdn provided by Talview (subscription based).
+
     -  Change the root_dir to root directory of your moodle installation.</br>
+
     *(Root directory is the directory where moodle is installed. If you can access moodle with a URL like this '<https://example.domain.com/>' then the directory is '/' and no configuration is required. If you access moodle with a URL like '<https://example.domain.com/moodle/>' then '/moodle/' is the root directory and the same needs to be configured in the root_dir field when installing proview.)*
 
 -   Installation Completed.
@@ -33,7 +37,6 @@ There are some plugin features to enable which user has to make some custom conf
 
 -   Course Level Configuration: Enable/Disable Proview for specific courses.
 -   Quiz Level Configuration: Enable Proview for specific quizzes. *(This is the default configuration, and will be used if no manual configuration is made by Admin.)*
-
 -   Proview Disabled group: Disable Proview for specific candidates in a course.
 
 ### Configurations to enable above mentioned features
@@ -74,11 +77,16 @@ As the name suggests, in this configuration Proview is enabled for specific quiz
 ***Note:** “Unproctored quiz” is also a valid name and proview will launch for that quiz (since the name contains the keyword “proctor”), even though the name is contradictory.*
 
 -   **Proview Disabled Group:** This is a user group which has to be created for each course in which you have specific candidates for whom proview should not load.
-    -   Go to the specific course and then go to Participants
-    -   Click the Settings Icon on the Right Hand Side and select “Groups” .
+    -   Go to the specific course and then go to Participants.
+
+    -   Click the Settings Icon on the Right Hand Side and select “Groups”.
+
     -   Click on “Create Group”.
+
     -   Set the group name as “proview_disabled”.
+
     -   Go to the course again and click on the Settings Icon on the Right Hand Side” and select “edit settings”.
+    
     -   Scroll down to “Groups” category and set group mode as “Seperate Groups”.</br>
     *Now any candidate you add in this group will not have proview enabled for them in this course.*    
 
