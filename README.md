@@ -55,7 +55,6 @@ There are some plugin features to enable which user has to make some custom conf
         -   Always On
         -   Quiz Level Configuration
         -   Always Off</br> ***Note:** Each value should be in a separate line and this order should be maintained.*
-      
     -   Set Default value as “Always On”.
    
     -   Set “Locked” as “No” and “Visible to” as “Everyone”.
@@ -87,7 +86,17 @@ As the name suggests, in this configuration Proview is enabled for specific quiz
     -   Go to the course again and click on the Settings Icon on the Right Hand Side” and select “edit settings”.
     
     -   Scroll down to “Groups” category and set group mode as “Seperate Groups”.</br>
-    *Now any candidate you add in this group will not have proview enabled for them in this course.*    
+    *Now any candidate you add in this group will not have proview enabled for them in this course.* 
+
+## Terms and Conditions
+
+---
+
+Talview Inc and all of its subsidiaries (“Talview”) provides Proview and its related services (“Service”) subject to your compliance with the terms and conditions (“Terms of Service”) set forth.
+
+Talview reserves the right to update and modify the Terms of Service at any time without notice. New features that may be added to the Service shall be subject to the Terms of Service. Should you continue to use the Service after any such modifications have been made, this shall constitute your agreement to such modifications. You may always view the most recent copy of the Terms of Service at "<https://www.talview.com/proview/terms-conditions>"
+
+Violation of any part of the Terms of Service will result in termination of your account.
 
 ## Roadmap
 
