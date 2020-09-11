@@ -25,6 +25,9 @@ namespace local_proview\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir . '/moodlelib.php');
+
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\request\writer;
 use \core_privacy\local\request\approved_contextlist;
@@ -65,7 +68,7 @@ class provider implements
             'privacy:metadata:local_proview'
         );
 
-        $collection->add_external_location_link('talview_proview', [
+        $collection->add_external_location_link('proview', [
             'ipaddress' => 'privacy:metadata:talview_proview:ipaddress',
             'candidate_video' => 'privacy:metadata:talview_proview:candidate_video',
             'candidate_audio' => 'privacy:metadata:talview_proview:candidate_audio',
@@ -145,7 +148,7 @@ class provider implements
      * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        global $DB;
+        global $DB, $CFG;
         if (empty($contextlist->count())) {
             return;
         }
@@ -167,14 +170,20 @@ class provider implements
         $params = [
             'userid' => $user->id,
         ] + $contextparams;
-        $lpmap = $DB->get_records_sql($sql, $params);
+        $lpmaps = $DB->get_records_sql($sql, $params);
         foreach ($contextlist->get_contexts() as $context) {
-            foreach ($lpmap as $lpmapstd) {
-                if ($lpmapstd->context_id == $context->id) {
-                    writer::with_context($context)
-                        ->export_data(["Proview"], $lpmapstd);
+            $lpmapstd = new stdClass();
+            $i = 1;
+            foreach ($lpmaps as $index => $lpmap) {
+                if ($lpmap->context_id == $context->id) {
+                    $id = $i.".";
+                    $lpmapstd->$id = $lpmap;
+                    unset($lpmaps[$index]);
                 }
+                $i += 1;
             }
+            writer::with_context($context)
+                ->export_data(["Proview"], $lpmapstd);
         }
     }
 
@@ -184,8 +193,14 @@ class provider implements
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
+        global $DB, $USER;
+        $userids = $userlist->get_userids();
 
+        if (empty($userids)) {
+            return;
+        }
+
+        $token = get_config('local_proview', 'token');
         $context = $userlist->get_context();
         $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
         $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
@@ -194,6 +209,26 @@ class provider implements
         $params = array_merge(['quiz_id' => $quiz->id], $userinparams);
         $sql = "quiz_id = :quiz_id AND user_id {$userinsql}";
 
+        $to = array();
+        $reply = array();
+        $from = array();
+
+        $to[0] = array("support@talview.com", "Talview Support");
+        $to[1] = array($USER->email, fullname($USER, true));
+        $reply[0] = array($USER->email, fullname($USER, true));
+        $from = self::get_from_user();
+
+        $txt = "As per GDPR Compliance, Please Delete the Proview data for the following details\nProfile ID: ( ";
+        foreach ($userids as $index => $userid) {
+            if ($index === 0) {
+                $txt .= $userid;
+            } else {
+                $txt .= ", {$userid}";
+            }
+        }
+        $txt .= ")\nUser Token: {$token}\nSession ID is like ( {$quiz->id}-* )";
+
+        self::send_mail($to, $reply, $from, $txt);
         $DB->delete_records_select('local_proview', $sql, $params);
     }
 
@@ -203,7 +238,7 @@ class provider implements
      * @param context $context Context to delete data from.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        global $DB;
+        global $DB, $USER;
 
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
@@ -214,11 +249,26 @@ class provider implements
             return;
         }
 
-        $DB->delete_records('local_proview', ['quiz_id' => $cm->instance]);
+        $token = get_config('local_proview', 'token');
+        $quizid = $cm->instance;
+        $to = array();
+        $reply = array();
+        $from = array();
+
+        $to[0] = array("support@talview.com","Talview Support");
+        $to[1] = array($USER->email, fullname($USER, true));
+        $reply[0] = array($USER->email, fullname($USER, true));
+        $from = self::get_from_user();
+
+        $txt = "As per GDPR Compliance, Please Delete the Proview data for all the sessions with\n";
+        $txt = "User Token: {$token}\nSession ID is like ( {$quizid}-* )";
+
+        self::send_mail($to, $reply, $from, $txt);
+        $DB->delete_records('local_proview', ['quiz_id' => $quizid]);
     }
 
     /**
-     * Delete multiple users within a single context.
+     * Delete all user data for the specified user, in the specified contexts.
      *
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
@@ -228,10 +278,109 @@ class provider implements
         if (empty($contextlist->count())) {
             return;
         }
-        $userid = $contextlist->get_user()->id;
+
+        $user = $contextlist->get_user();
+        $token = get_config('local_proview', 'token');
+
+        $quizids = array();
+        $to = array();
+        $reply = array ();
+        $from = array();
+
+        $to[0] = array("support@talview.com", "Talview Support");
+        $to[1] = array($user->email, fullname($user, true));
+        $reply[0] = array($user->email, fullname($user, true));
+        $from = self::get_from_user();
+
         foreach ($contextlist->get_contexts() as $context) {
             $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
-            $DB->delete_records('local_proview', ['quiz_id' => $instanceid, 'user_id' => $userid]);
+            array_push($quizids, $instanceid);
+            $DB->delete_records('local_proview', ['quiz_id' => $instanceid, 'user_id' => $user->id]);
         }
+
+        $txt = "As per GDPR Compliance, Please Delete the Proview data for the following details\n";
+        $txt = "Profile ID: {$user->id}\nUser Token: {$token}\nSession ID is like ( ";
+        foreach ($quizids as $index => $quizid) {
+            if ($index === 0) {
+                $txt .= "{$quizid}-*";
+            } else {
+                $txt .= ", {$quizid}-*";
+            }
+        }
+        $txt .= " )";
+
+        self::send_mail($to, $reply, $from, $txt);
+    }
+
+
+    /**
+     * Fetch email ID and name for From field
+     *
+     * Priority level based on which email address is selected to send the email is as follows:
+     * noreply > smtpuser > admin > default (noreply@moodle.com)
+     * 
+     * @return array Array is returned with sender email address in cell 0 and sender name in cell 1
+     */
+    private static function get_from_user() : array {
+        global $CFG;
+        $primaryadmin = get_admin();
+        $noreply = empty($CFG->noreplyaddress) ? 'noreply@' . get_host_from_url($CFG->wwwroot) : $CFG->noreplyaddress;
+
+        $fromemail = "";
+        $fromname = "";
+        if (!validate_email($noreply)) {
+            if (!validate_email($CFG->smtpuser)) {
+                if (!validate_email($primaryadmin->email)) {
+                    $fromemail = "noreply@moodle.com";
+                    $fromname = "Moodle";
+                } else {
+                    $fromemail = $primaryadmin->email;
+                    $fromname = fullname($primaryadmin, true);
+                }
+            } else {
+                $fromemail = $CFG->smtpuser;
+                $fromname = "Moodle";
+            }
+        } else {
+            $fromemail = $noreply;
+            $fromname = "No Reply";
+        }
+        return array($fromemail, $fromname);
+    }
+
+    /**
+     * Send Email to support@talview.com to raise a GDPR Request to delete data from Talviews Server
+     *
+     * @param array $to
+     * @param array $reply
+     * @param array $from
+     * @param string $txt
+     * @return boolean true if mail is sent otherwise false
+     */
+    private static function send_mail(array $to, array $reply, array $from, string $txt) {
+        $sitename = get_site();
+        $token = get_config('local_proview', 'token');
+        $subject = "GDPR Request from Moodle | {$sitename->fullname}";
+
+        $mail = get_mailer();
+        $mail->isHTML(false);
+        $mail->Subject = $subject;
+        $mail->Body = $txt;
+        $mail->From = $from[0];
+        $mail->FromName = $from[1];
+
+        foreach ($to as $toemail) {
+            $mail->addAddress($toemail[0], $toemail[1]);
+        }
+        foreach ($reply as $replyemail) {
+            $mail->addReplyTo($replyemail[0], $replyemail[1]);
+        }
+
+        if (!$mail->send()) {
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+            return false;
+        }
+        return true;
     }
 }
