@@ -55,6 +55,13 @@ if (is_siteadmin()) {
     $setting = new admin_setting_configtext($name, $title, $description, $default);
     $settings->add($setting);
 
+    $name = 'local_proview/proview_acc_name';
+    $title = get_string('proview_acc_name', 'local_proview');
+    $description = get_string('proview_acc_name_desc', 'local_proview');
+    $default = '';
+    $setting = new admin_setting_configtext($name, $title, $description, $default);
+    $settings->add($setting);
+
     $name = 'local_proview/root_dir';
     $title = get_string('root_dir', 'local_proview');
     $description = get_string('root_dir_desc', 'local_proview');

@@ -227,7 +227,7 @@ class provider implements
                 $txt .= ", {$userid}";
             }
         }
-        $txt .= ")\nUser Token: {$token}\nSession ID is like ( {$quiz->id}-* )";
+        $txt .= ")\nSession ID is like ( {$quiz->id}-* )";
 
         self::send_mail($to, $reply, $from, $txt);
         $DB->delete_records_select('local_proview', $sql, $params);
@@ -262,7 +262,7 @@ class provider implements
         $from = self::get_from_user();
 
         $txt = "As per GDPR Compliance, Please Delete the Proview data for all the sessions with\n";
-        $txt = "User Token: {$token}\nSession ID is like ( {$quizid}-* )";
+        $txt .= "Session ID is like ( {$quizid}-* )";
 
         self::send_mail($to, $reply, $from, $txt);
         $DB->delete_records('local_proview', ['quiz_id' => $quizid]);
@@ -300,7 +300,7 @@ class provider implements
         }
 
         $txt = "As per GDPR Compliance, Please Delete the Proview data for the following details\n";
-        $txt = "Profile ID: {$user->id}\nUser Token: {$token}\nSession ID is like ( ";
+        $txt .= "Profile ID: {$user->id}\nSession ID is like ( ";
         foreach ($quizids as $index => $quizid) {
             if ($index === 0) {
                 $txt .= "{$quizid}-*";
@@ -361,7 +361,11 @@ class provider implements
     private static function send_mail(array $to, array $reply, array $from, string $txt) {
         $sitename = get_site();
         $token = get_config('local_proview', 'token');
-        $subject = "GDPR Request from Moodle | {$sitename->fullname}";
+        $account = get_config('local_proview', 'proview_acc_name');
+        if ($account == '') {
+            $account = $sitename->fullname;
+        }
+        $subject = "GDPR Request from Moodle | {$account}";
 
         $mail = get_mailer();
         $mail->isHTML(false);

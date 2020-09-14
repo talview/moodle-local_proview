@@ -32,6 +32,8 @@ $string['token'] = 'Proview Token';
 $string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
+$string['proview_acc_name'] = 'Proview Account Name';
+$string['proview_acc_name_desc'] = 'Account Name provided by Talview, If not provided use your organisation name.';
 $string['root_dir'] = 'Root Dir';
 $string['root_dir_desc'] = 'Root Dir';
 
