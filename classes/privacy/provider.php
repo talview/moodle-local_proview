@@ -19,6 +19,7 @@
  * @package    local_proview
  * @copyright  2020 Talview <privacy@talview.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses       die
  */
 
 namespace local_proview\privacy;
