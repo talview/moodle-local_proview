@@ -23,6 +23,7 @@
  * @copyright  Talview, 2020
  * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses       die
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -35,10 +36,6 @@ use local_proview\injector;
  */
 function local_proview_before_standard_top_of_body_html() {
 
-//    if(!headers_sent()){
-//        @header_remove('Feature-Policy');
-//        @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none'; camera: '*';");
-//    }
 }
 
 /**
@@ -46,7 +43,7 @@ function local_proview_before_standard_top_of_body_html() {
  *
  */
 function local_proview_before_http_headers() {
-//    injector::inject();
+
 }
 
 function local_proview_before_footer() {

@@ -25,17 +25,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//require_login();
-
 // Include config.php.
 // @codingStandardsIgnoreStart
 // Let codechecker ignore the next line because otherwise it would complain about a missing login check
 // after requiring config.php which is really not needed.
 require_once('../../config.php');
 // @codingStandardsIgnoreEnd
-
-// Include lib.php.
-//require_once(__DIR__ . '/lib.php');
 
 // Globals.
 global $PAGE, $COURSE;
@@ -53,7 +48,10 @@ echo $OUTPUT->header();
 <iframe id="contentIFrame" title="Iframe application" style="width: 98vw; height:95vh; border: 0px;">
   <p>Your browser does not support iframes.</p>
 </iframe>
-<script src="https://browser.sentry-cdn.com/5.18.1/bundle.min.js" integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" crossorigin="anonymous"></script>
+<script src="https://browser.sentry-cdn.com/5.18.1/bundle.min.js" 
+        integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" 
+        crossorigin="anonymous">
+</script>
 <script>
    var childOrigin = '*';
    Sentry.init({
@@ -61,7 +59,6 @@ echo $OUTPUT->header();
    });
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
-    //  if (event.origin == childOrigin) {
       try {
         if(event.data.type == 'startProview') {
             startProview(...event.data.args);
@@ -80,21 +77,6 @@ echo $OUTPUT->header();
     }
 
     window.addEventListener("message", receiveMessage, false);
-
-    // window.parent.addEventListener('error', function(e) { //added event listner on parent
-    //   if (window.parent != window.top) {
-    //     document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; //setting error page when error occurred.
-    //   }
-    // }, false);
-
-    // window.addEventListener('error', function(error) { //added event listner on the window object which will listen for all the errors
-    //   if( error && error.error ) {
-    //     Sentry.captureException(error.error);
-    //   } else {
-    //     Sentry.captureException(error);
-    //   }
-    // }, true);
-
 
     //Javascript function to start proview invoked upon postMessage from iframe
     function startProview(authToken, profileId, session, proview_url, skipHardwareTest, previewStyle, clear) {
@@ -153,19 +135,24 @@ echo $OUTPUT->header();
         function run(){
           xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState === 4) {
-              // console.log(xmlhttp.response);
             }
             if (xmlhttp.status == 404) {
               if (retries > 0) {
                 retries-=1;
-                // console.log(retries,": ",xmlhttp);
                 run();
               } else if(xmlhttp.readyState === 4) {
                 ProctorClient3.stop(function() {
                   window.ProviewStatus = 'stop';
                 });
-                document.body.style.margin='0px';
-                document.body.innerHTML=`<iframe id="errorIFrame" src='https://pages.talview.com/proview/error/index.html' title="Proview Error" style="width: 100vw; height:99vh; border: 0px;"><p>Your browser does not support iframes</p></iframe>`;
+                document.body.style.margin = '0px';
+                document.body.innerHTML = `<iframe id="errorIFrame"
+                        src='https://pages.talview.com/proview/error/index.html'
+                        title="Proview Error"
+                        style="width: 100%;
+                        height:100%;
+                        border: 0px;">
+                    <p>Your browser does not support iframes</p>
+                </iframe>`;
                 Sentry.captureException(new Error(xmlhttp.response));
               }
             }
