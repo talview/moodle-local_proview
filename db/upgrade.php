@@ -29,12 +29,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Upgrade local_proview.
+ * Function to upgrade local_proview.
  *
- * @param int $oldversion
+ * @param int $oldversion the version we are upgrading from
  * @return bool always true
  */
-
 function xmldb_local_proview_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();

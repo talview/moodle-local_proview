@@ -44,17 +44,23 @@ class injector {
     private static $injected = false;
 
     /**
-     * Do the actual analytics code injection.
+     * Inject the password of the quiz if the quiz is password protected.
      *
+     * @param moodle_page $PAGE Moodle PAGE class
+     * @param stdClass $quiz Moodle quiz class
      * @return null
      */
-
     private static function inject_password($PAGE, $quiz) {
         if ($quiz->password) {                          // If the quiz is password protected then inject the js.
             $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
         }
     }
 
+    /**
+     * Do the actual analytics code injection.
+     *
+     * @return null
+     */
     public static function inject() {
         global $USER, $COURSE, $DB, $PAGE;
 
