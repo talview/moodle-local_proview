@@ -35,15 +35,6 @@ use \core_privacy\local\request\approved_contextlist;
 use \core_privacy\local\request\contextlist;
 use stdClass;
 
-if (interface_exists('\core_privacy\local\request\userlist')) {
-    interface my_userlist extends \core_privacy\local\request\userlist{
-
-    }
-} else {
-    interface my_userlist {
-
-    };
-}
 /**
  * Privacy Subsystem implementation for local_proview.
  * @copyright  2020 Talview <privacy@talview.com>
@@ -54,8 +45,15 @@ class provider implements
         \core_privacy\local\metadata\provider,
         \core_privacy\local\request\data_provider,
         \core_privacy\local\request\core_user_data_provider,
-        my_userlist {
+        \core_privacy\local\request\core_userlist_provider
+        {
 
+    /**
+     * Returns metadata.
+     *
+     * @param collection $collection The initialised collection to add items to.
+     * @return collection A listing of user data stored through this system.
+     */
     public static function get_metadata(collection $collection) : collection {
 
         $collection->add_database_table(
@@ -89,7 +87,7 @@ class provider implements
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
-    public static function get_users_in_context(userlist $userlist) {
+    public static function get_users_in_context(\core_privacy\local\request\userlist $userlist) {
 
         global $DB;
         $context = $userlist->get_context();
@@ -193,7 +191,7 @@ class provider implements
      *
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
-    public static function delete_data_for_users(approved_userlist $userlist) {
+    public static function delete_data_for_users(\core_privacy\local\request\approved_userlist $userlist) {
         global $DB, $USER;
         $userids = $userlist->get_userids();
 
@@ -256,7 +254,7 @@ class provider implements
         $reply = array();
         $from = array();
 
-        $to[0] = array("support@talview.com","Talview Support");
+        $to[0] = array("support@talview.com", "Talview Support");
         $to[1] = array($USER->email, fullname($USER, true));
         $reply[0] = array($USER->email, fullname($USER, true));
         $from = self::get_from_user();
@@ -271,7 +269,7 @@ class provider implements
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
-     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     * @param approved_contextlist $contextlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
@@ -319,7 +317,7 @@ class provider implements
      *
      * Priority level based on which email address is selected to send the email is as follows:
      * noreply > smtpuser > admin > default (noreply@moodle.com)
-     * 
+     *
      * @return array Array is returned with sender email address in cell 0 and sender name in cell 1
      */
     private static function get_from_user() : array {
@@ -352,13 +350,13 @@ class provider implements
     /**
      * Send Email to support@talview.com to raise a GDPR Request to delete data from Talviews Server
      *
-     * @param array $to
-     * @param array $reply
-     * @param array $from
-     * @param string $txt
+     * @param array $to An array cokntaining To Addresses
+     * @param array $reply An array containing Reply to addresses
+     * @param array $from An array containing from addresses
+     * @param string $txt The main body of the mail in plain text
      * @return boolean true if mail is sent otherwise false
      */
-    private static function send_mail(array $to, array $reply, array $from, string $txt) {
+    private static function send_mail(array $to, array $reply, array $from, string $txt) : boolean {
         $sitename = get_site();
         $token = get_config('local_proview', 'token');
         $account = get_config('local_proview', 'proview_acc_name');

@@ -46,6 +46,10 @@ function local_proview_before_http_headers() {
 
 }
 
+/**
+ * Output callback, available since Moodle 3.3
+ *
+ */
 function local_proview_before_footer() {
     injector::inject();
 }
