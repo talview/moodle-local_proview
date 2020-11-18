@@ -26,7 +26,7 @@
  * @uses       die
  */
 
-namespace local_proview\api;
+namespace local_proview\local\api;
 
 use stdClass;
 

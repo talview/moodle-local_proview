@@ -28,7 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-use local_proview\injector;
+use local_proview\local\injector;
 
 /**
  * Output callback, available since Moodle 3.3
