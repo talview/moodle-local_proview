@@ -37,18 +37,22 @@ global $DB;
 
 $post = json_decode(file_get_contents('php://input'));
 
-$attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
-
-if ($attempt && $attempt->id) {
-    // Inserting attempt data in local_proview table.
-    $response = $DB->insert_record('local_proview', [
-                        "quiz_id" => $post->quiz_id,
-                        "proview_url" => $post->proview_url,
-                        "user_id" => $post->user_id,
-                        "attempt_no" => $attempt->id
-                    ]);
-    print $response;
-    return;
+if ($post->sesskey == sesskey()){
+    $attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
+    if ($attempt && $attempt->id) {
+        // Inserting attempt data in local_proview table.
+        $response = $DB->insert_record('local_proview', [
+                            "quiz_id" => $post->quiz_id,
+                            "proview_url" => $post->proview_url,
+                            "user_id" => $post->user_id,
+                            "attempt_no" => $attempt->id
+                        ]);
+        print $response;
+        return;
+    }
+    http_response_code(404);
+    print "Attempt not found";
 }
-http_response_code(404);
-print "Attempt not found";
+
+http_response_code(401);
+print "Invalid sesskey";

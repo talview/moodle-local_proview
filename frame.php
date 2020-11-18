@@ -41,6 +41,8 @@ $PAGE->set_pagelayout('embedded');
 $PAGE->set_heading("Proview Quiz");
 $PAGE->set_url('/local/proview/frame.php');
 
+$sesskey=sesskey();
+
 echo $OUTPUT->header();
 
 ?>
@@ -128,6 +130,7 @@ echo $OUTPUT->header();
           "user_id"       : urlParams.get('profile'),
           "quiz_id"       : urlParams.get('quizId'),
           "proview_url"   : url,
+          "sesskey"       : "<?php echo $sesskey ?>"
         }
         const xmlhttp = new XMLHttpRequest();
         
