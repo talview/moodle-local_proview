@@ -23,7 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_proview;
+namespace local_proview\local;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -73,7 +73,7 @@ class injector {
         try {
             $list = new \core_course_list_element($COURSE);
             $datas = $list->get_custom_fields();
-            $courselevelconfiguration;                   // Field for storing course level configuration.
+            $courselevelconfiguration=0;                   // Field for storing course level configuration.
             foreach ($datas as $data) {
                 if (empty($data->get_value())) {
                     continue;
