@@ -73,7 +73,7 @@ class injector {
         try {
             $list = new \core_course_list_element($COURSE);
             $datas = $list->get_custom_fields();
-            $courselevelconfiguration=0;                   // Field for storing course level configuration.
+            $courselevelconfiguration = 0;                   // Field for storing course level configuration.
             foreach ($datas as $data) {
                 if (empty($data->get_value())) {
                     continue;

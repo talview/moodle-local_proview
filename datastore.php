@@ -33,12 +33,13 @@ require_once('../../config.php');
 // @codingStandardsIgnoreEnd
 
 // Globals.
-global $DB;
+global $DB, $USER, $PAGE;
 
 $post = json_decode(file_get_contents('php://input'));
 
-if ($post->sesskey == sesskey()){
-    $attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
+if ($post && ($post->sesskey == sesskey())) {
+    $attempt = $DB->get_record('quiz_attempts',
+        array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
     if ($attempt && $attempt->id) {
         // Inserting attempt data in local_proview table.
         $response = $DB->insert_record('local_proview', [
@@ -52,6 +53,33 @@ if ($post->sesskey == sesskey()){
     }
     http_response_code(404);
     print "Attempt not found";
+}
+
+$query = $_SERVER['QUERY_STRING'];
+
+$quizid = explode('=', explode('&', $query)[0])[1];
+$sesskey = explode('=', explode('&', $query)[1])[1];
+
+$template = new stdClass();
+if ($sesskey == sesskey()) {
+    $quiz = $DB->get_record('quiz', array('id' => $quizid));      // Fetching current quiz data for password.
+
+    $attempt = $DB->get_record('quiz_attempts', array('quiz' => $quizid, 'userid' => $USER->id, 'state' => 'inprogress'));
+    if (!$attempt) {
+        $attempts = $DB->get_records('quiz_attempts', array('quiz' => $quizid, 'userid' => $USER->id));
+        $attempt = $attempts ? max(array_filter(array_column($attempts, 'attempt'))) : 0;
+        $attempt += 1;
+    } else {
+        $attempt = $attempt->attempt;
+    }
+
+    $template->quiz_password = ($quiz->password ? $quiz->password : null);
+    $template->profile_id = $USER->id;
+    $template->session_id = $quizid.'-'.$attempt;
+    $template->proview_url = get_config('local_proview', 'proview_url');
+    $template->token = get_config('local_proview', 'token');
+    echo json_encode($template);
+    return;
 }
 
 http_response_code(401);

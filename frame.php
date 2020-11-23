@@ -41,7 +41,7 @@ $PAGE->set_pagelayout('embedded');
 $PAGE->set_heading("Proview Quiz");
 $PAGE->set_url('/local/proview/frame.php');
 
-$sesskey=sesskey();
+$sesskey = sesskey();
 
 echo $OUTPUT->header();
 
@@ -55,10 +55,10 @@ echo $OUTPUT->header();
         crossorigin="anonymous">
 </script>
 <script>
-   var childOrigin = '*';
-   Sentry.init({
-     dsn: 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587'
-   });
+    var childOrigin = '*';
+    Sentry.init({
+      dsn: 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587'
+    });
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
       try {
@@ -95,83 +95,85 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: onProviewStart
+            initCallback: createCallback(proview_url, profileId)/* onProviewStart */
       });
     }
 
-    function onProviewStart(err, id) {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        window.ProviewStatus = 'start';
-        let iframeWindow = document.getElementById('contentIFrame').contentWindow;
+    function createCallback (proview_url, profile_id) {
+      return function onProviewStart(err, id) {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          window.ProviewStatus = 'start';
+          let iframeWindow = document.getElementById('contentIFrame').contentWindow;
 
-        //Lock quiz logic STARTS
-        const button = iframeWindow.document.getElementById('id_quizpassword');
-        if( button ) { //checking if the password is enabled for the quiz or not
-          button.value = window.quizPassword; //fetching the password value from the window object
-          iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
-        }
-        const id_submitbutton = iframeWindow.document.getElementById('id_submitbutton');
-        if( id_submitbutton ) { //handle if the test is timed quiz
-          id_submitbutton.click();//submitting the form
-        }
-        //Lock quiz logic ENDS
-        iframeWindow.postMessage({
-          type: 'startedProview',
-          args: [
-            err,   //Error on proview stating, if any
-            id     // Playback ID
-          ]
-        }, childOrigin);
-        
-        let url = urlParams.get('proview_url') || '//cdn.proview.io/init.js';
-        url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/':'https://app.proview.io/embedded/') + id;
-        const arr = {
-          "user_id"       : urlParams.get('profile'),
-          "quiz_id"       : urlParams.get('quizId'),
-          "proview_url"   : url,
-          "sesskey"       : "<?php echo $sesskey ?>"
-        }
-        const xmlhttp = new XMLHttpRequest();
-        
-        let retries=5;
-        function run(){
-          xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState === 4) {
-            }
-            if (xmlhttp.status == 404) {
-              if (retries > 0) {
-                retries-=1;
-                run();
-              } else if(xmlhttp.readyState === 4) {
-                ProctorClient3.stop(function() {
-                  window.ProviewStatus = 'stop';
-                });
-                document.body.style.margin = '0px';
-                document.body.innerHTML = `<iframe id="errorIFrame"
-                        src='https://pages.talview.com/proview/error/index.html'
-                        title="Proview Error"
-                        style="width: 100%;
-                        height:100%;
-                        border: 0px;">
-                    <p>Your browser does not support iframes</p>
-                </iframe>`;
-                Sentry.captureException(new Error(xmlhttp.response));
+          //Lock quiz logic STARTS
+          const button = iframeWindow.document.getElementById('id_quizpassword');
+          if( button ) { //checking if the password is enabled for the quiz or not
+            button.value = window.quizPassword; //fetching the password value from the window object
+            iframeWindow.document.getElementById('mod_quiz_preflight_form').submit(); //submitting the password form
+          }
+          const id_submitbutton = iframeWindow.document.getElementById('id_submitbutton');
+          if( id_submitbutton ) { //handle if the test is timed quiz
+            id_submitbutton.click();//submitting the form
+          }
+          //Lock quiz logic ENDS
+          iframeWindow.postMessage({
+            type: 'startedProview',
+            args: [
+              err,   //Error on proview stating, if any
+              id     // Playback ID
+            ]
+          }, childOrigin);
+          
+          let url = proview_url || '//cdn.proview.io/init.js';
+          url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/':'https://app.proview.io/embedded/') + id;
+          const arr = {
+            "user_id"       : profile_id,
+            "quiz_id"       : urlParams.get('quizId'),
+            "proview_url"   : url,
+            "sesskey"       : "<?php echo $sesskey ?>"
+          }
+          const xmlhttp = new XMLHttpRequest();
+          
+          let retries=5;
+          function run(){
+            xmlhttp.onreadystatechange = function() {
+              if (xmlhttp.readyState === 4) {
+              }
+              if (xmlhttp.status == 404) {
+                if (retries > 0) {
+                  retries-=1;
+                  run();
+                } else if(xmlhttp.readyState === 4) {
+                  ProctorClient3.stop(function() {
+                    window.ProviewStatus = 'stop';
+                  });
+                  document.body.style.margin = '0px';
+                  document.body.innerHTML = `<iframe id="errorIFrame"
+                          src='https://pages.talview.com/proview/error/index.html'
+                          title="Proview Error"
+                          style="width: 100%;
+                          height:100%;
+                          border: 0px;">
+                      <p>Your browser does not support iframes</p>
+                  </iframe>`;
+                  Sentry.captureException(new Error(xmlhttp.response));
+                }
               }
             }
+            xmlhttp.open("POST","datastore.php",true);
+            xmlhttp.send(JSON.stringify(arr));
           }
-          xmlhttp.open("POST","datastore.php",true);
-          xmlhttp.send(JSON.stringify(arr));
+          run();
+        } catch (error) {
+          console.log("Enter catch")
+          if( error && error.error ) {
+            Sentry.captureException(error.error);
+          } else {
+            Sentry.captureException(error);
+          }
+          document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; 
         }
-        run();
-      } catch (error) {
-        console.log("Enter catch")
-        if( error && error.error ) {
-          Sentry.captureException(error.error);
-        } else {
-          Sentry.captureException(error);
-        }
-        document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html'; 
       }
     }
 
@@ -198,8 +200,21 @@ echo $OUTPUT->header();
       try {
         const urlParams = new URLSearchParams(window.location.search);
         window.iframeUrl = urlParams.get('url');
-        window.quizPassword = urlParams.get('quizPassword'); //setting quiz password
-        startProview(urlParams.get('token'), urlParams.get('profile'), urlParams.get('session'), urlParams.get('proview_url'));
+        const xmlhttp = new XMLHttpRequest();
+        
+        function run(){
+          xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState === 4 && this.status == 200) {
+              response=xmlhttp.responseText;
+              response=JSON.parse(response);
+              window.quizPassword = response.quiz_password;
+              startProview(response.token, response.profile_id, response.session_id, response.proview_url);
+            }
+          }
+          xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);
+          xmlhttp.send();
+        }
+        run();
       } catch (error) {
         if( error && error.error ) {
           Sentry.captureException(error.error);
