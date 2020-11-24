@@ -122,9 +122,11 @@ class injector {
 
                     if ($groupmember) {
                         $cm = $PAGE->cm;
-                        $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+                        if ($cm) {
+                            $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
 
-                        self::inject_password($PAGE, $quiz);
+                            self::inject_password($PAGE, $quiz);
+                        }
                         return;
                     }
                 }
