@@ -107,4 +107,3 @@ Violation of any part of the Terms of Service will result in termination of your
 -   [x] Switch off Proview for some quizzes
 -   [x] Integrated playback component into moodle admin view
 -   [ ] Candidate ID Correlation
--   [ ] Moodle 2.x Support
