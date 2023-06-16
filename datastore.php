@@ -73,11 +73,12 @@ if ($sesskey == sesskey()) {
         $attempt = $attempt->attempt;
     }
 
+    $template->session_type = (strpos (json_encode($quiz->name), "LP") ? "live_proctor" : (strpos (json_encode($quiz->name), "RR") ? "record_and_review" : "ai_proctor"));
     $template->quiz_password = ($quiz->password ? $quiz->password : null);
     $template->profile_id = $USER->id;
     $template->session_id = $quizid.'-'.$attempt;
-    $template->proview_url = get_config('local_proview', 'proview_url');
-    $template->token = get_config('local_proview', 'token');
+    $template->proview_url = trim(get_config('local_proview', 'proview_url'));
+    $template->token = trim(get_config('local_proview', 'token'));
     echo json_encode($template);
     return;
 }

@@ -131,6 +131,22 @@ class injector {
                     }
                 }
                 // Logic for enabling specific user to use proctored assessment ENDS.
+                // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword STARTS
+                if ($PAGE->cm) {
+                    $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+                    if (strpos ($quiz->name, ('TSB')) !== FALSE) { // add check for broswer-agent
+                        print $PAGE->url;
+                        echo $_SERVER ['HTTP_USER_AGENT'];
+                        $tsbURL = "tsb://".explode("://",$PAGE->url)[1];
+                        if (!headers_sent()) {
+                            header('Location: '.$tsbURL);
+                        } else {
+                            echo ("<script>location.href='$tsbURL'</script>");
+                        }
+                        die;
+                    }
+                }
+                // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword ENDS
                 if (self::$injected) {
                     return;
                 }
