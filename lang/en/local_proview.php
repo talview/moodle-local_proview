@@ -27,11 +27,21 @@
 
 $string['pluginname'] = 'Proview';
 $string['proview_url'] = 'Proview Endpoint URL';
-$string['proview_url_desc'] = 'Enter the Proview End point URL ';
+$string['proview_url_desc'] = 'Enter the Proview End point URL';
+$string['proview_admin_url'] = 'Proview Admin URL';
+$string['proview_admin_url_desc'] = 'Enter the Proview Admin URL provided by Talview';
 $string['token'] = 'Proview Token';
 $string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
+$string['string_match'] = 'String Matching';
+$string['string_match_desc'] = 'Enable this setting to enable proview and TSB on quiz level basis string matching on Quiz name. When this setting is enabled following checks will be performed on quiz title.<br />
+If quiz title contains "proctor" keyword (case insesitive) then proview will be enabled for that quiz.<br />
+The following checks are performed if proview is launched for the quiz: <br />
+<ol> <li>If quiz title contains "LP" keyword (case sensitive) then Live Proctoring will be enabled for that quiz. </li>
+<li> If quiz title contains "RR" keyword (case sensitive) then Record and Review will be enabled for that quiz. </li>
+<li> If quiz title contains "AI" keyword (case sensitive) then AI Proctoring will be enabled for that quiz. </li>
+<li> If quiz title contains "TSB" keyword (case sensitive) then exam will only launch on Talview Safe Exam Browser. </li> </ol>';
 $string['proview_acc_name'] = 'Proview Account Name';
 $string['proview_acc_name_desc'] = 'Account Name provided by Talview, If not provided use your organisation name.';
 $string['root_dir'] = 'Root Dir';

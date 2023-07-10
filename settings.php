@@ -41,6 +41,13 @@ if (is_siteadmin()) {
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $settings->add($setting);
 
+    $name = 'local_proview/string_match';
+    $title = get_string('string_match', 'local_proview');
+    $description = get_string('string_match_desc', 'local_proview');
+    $default = true;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $settings->add($setting);
+
     $name = 'local_proview/token';
     $title = get_string('token', 'local_proview');
     $description = get_string('token_desc', 'local_proview');
@@ -52,6 +59,13 @@ if (is_siteadmin()) {
     $title = get_string('proview_url', 'local_proview');
     $description = get_string('proview_url_desc', 'local_proview');
     $default = '';
+    $setting = new admin_setting_configtext($name, $title, $description, $default);
+    $settings->add($setting);
+
+    $name = 'local_proview/proview_admin_url';
+    $title = get_string('proview_admin_url', 'local_proview');
+    $description = get_string('proview_admin_url_desc', 'local_proview');
+    $default = 'https://appv7.proview.io/embedded';
     $setting = new admin_setting_configtext($name, $title, $description, $default);
     $settings->add($setting);
 
