@@ -65,6 +65,7 @@ class injector {
         global $USER, $COURSE, $DB, $PAGE;
 
         $enabled = get_config('local_proview', 'enabled');
+        $string_match = get_config('local_proview', 'string_match');
         if (!$enabled) {
             return;
         }
@@ -89,6 +90,10 @@ class injector {
                         break;
                     case 2:      // Proview Enabled for specific quizes.
                         if ($quiz && $quiz->id) {
+                            if (!$string_match) {
+                                self::inject_password($PAGE, $quiz);
+                                return; 
+                            }
                             if (!stripos (json_encode($quiz->name), "Proctor")) {
                                 self::inject_password($PAGE, $quiz);
                                 return;
@@ -101,6 +106,10 @@ class injector {
                         break;
                     default:    // If course level configuration is not enabled then Quiz level configuration is enabled by default.
                         if ($quiz && $quiz->id) {
+                            if (!$string_match) {
+                                self::inject_password($PAGE, $quiz);
+                                return; 
+                            }
                             if (!stripos (json_encode($quiz->name), "Proctor")) {
                                 self::inject_password($PAGE, $quiz);
                                 return;

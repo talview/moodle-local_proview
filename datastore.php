@@ -72,8 +72,12 @@ if ($sesskey == sesskey()) {
     } else {
         $attempt = $attempt->attempt;
     }
-
-    $template->session_type = (strpos (json_encode($quiz->name), "LP") ? "live_proctor" : (strpos (json_encode($quiz->name), "RR") ? "record_and_review" : "ai_proctor"));
+    $string_match = get_config('local_proview', 'string_match');
+    if ($string_match) {
+        $template->session_type = (strpos (json_encode($quiz->name), "LP") ? "live_proctor" : (strpos (json_encode($quiz->name), "RR") ? "record_and_review" : "ai_proctor"));
+    } else {
+        $template->session_type = "ai_proctor";
+    }
     $template->quiz_password = ($quiz->password ? $quiz->password : null);
     $template->profile_id = $USER->id;
     $template->session_id = $template->session_type === "live_proctor" ? $quizid : $quizid.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
