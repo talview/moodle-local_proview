@@ -144,10 +144,10 @@ class injector {
                 // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword STARTS
                 if ($PAGE->cm) {
                     $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-                    print $PAGE->url."\n";
+                    // print $PAGE->url."\n";
 
                     if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE) && strpos ($quiz->name, ('TSB')) !== FALSE && $_SERVER ['HTTP_USER_AGENT'] != "Proview-SB") {
-                        echo $_SERVER ['HTTP_USER_AGENT'];
+                        // echo $_SERVER ['HTTP_USER_AGENT'];
                         $tsbURL = "tsb://".explode("://",$PAGE->url)[1];
                         if (!headers_sent()) {
                             header('Location: '.$tsbURL);
