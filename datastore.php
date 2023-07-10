@@ -76,7 +76,7 @@ if ($sesskey == sesskey()) {
     $template->session_type = (strpos (json_encode($quiz->name), "LP") ? "live_proctor" : (strpos (json_encode($quiz->name), "RR") ? "record_and_review" : "ai_proctor"));
     $template->quiz_password = ($quiz->password ? $quiz->password : null);
     $template->profile_id = $USER->id;
-    $template->session_id = $quizid.'-'.$attempt;
+    $template->session_id = $template->session_type === "live_proctor" ? $quizid : $quizid.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
     $template->proview_url = trim(get_config('local_proview', 'proview_url'));
     $template->token = trim(get_config('local_proview', 'token'));
     echo json_encode($template);
