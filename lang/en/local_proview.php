@@ -28,8 +28,8 @@
 $string['pluginname'] = 'Proview';
 $string['proview_url'] = 'Proview Endpoint URL';
 $string['proview_url_desc'] = 'Enter the Proview End point URL';
-$string['proview_admin_url'] = 'Proview Admin URL';
-$string['proview_admin_url_desc'] = 'Enter the Proview Admin URL provided by Talview';
+$string['proview_playback_url'] = 'Proview Playback URL';
+$string['proview_playback_url_desc'] = 'Enter the Proview Playback URL provided by Talview';
 $string['token'] = 'Proctor Token';
 $string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';

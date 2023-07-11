@@ -62,9 +62,9 @@ if (is_siteadmin()) {
     $setting = new admin_setting_configtext($name, $title, $description, $default);
     $settings->add($setting);
 
-    $name = 'local_proview/proview_admin_url';
-    $title = get_string('proview_admin_url', 'local_proview');
-    $description = get_string('proview_admin_url_desc', 'local_proview');
+    $name = 'local_proview/proview_playback_url';
+    $title = get_string('proview_playback_url', 'local_proview');
+    $description = get_string('proview_playback_url_desc', 'local_proview');
     $default = 'https://appv7.proview.io/embedded';
     $setting = new admin_setting_configtext($name, $title, $description, $default);
     $settings->add($setting);
