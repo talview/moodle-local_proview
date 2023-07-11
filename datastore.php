@@ -74,7 +74,7 @@ if ($sesskey == sesskey()) {
     }
     $string_match = get_config('local_proview', 'string_match');
     if ($string_match) {
-        $template->session_type = (strpos (json_encode($quiz->name), "LP") ? "live_proctor" : (strpos (json_encode($quiz->name), "RR") ? "record_and_review" : "ai_proctor"));
+        $template->session_type = (strpos (json_encode($quiz->name), "[LP]") ? "live_proctor" : (strpos (json_encode($quiz->name), "[RR]") ? "record_and_review" : "ai_proctor"));
     } else {
         $template->session_type = "ai_proctor";
     }
