@@ -38,7 +38,7 @@ $string['string_match'] = 'String Matching';
 $string['string_match_desc'] = 'Enable this setting to enable Proview on quiz level basis string matching on the Quiz title.<br />
 When this setting is enabled following checks will be performed on the quiz title.<br />
 If the quiz title contains the "proctor" keyword (case insensitive) then Proview will be enabled for that quiz. <br />
-The following checks are performed if Proview is launched for the quiz: 
+The following checks are performed if Proview is launched for the quiz:
 <ol>
 <li>If the quiz title contains the "[LP]" keyword (case sensitive) then Live Proctoring will be enabled for that quiz.</li>
 <li>If the quiz title contains the "[RR]" keyword (case sensitive) then Record and Review will be enabled for that quiz.</li>

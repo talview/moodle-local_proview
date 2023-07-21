@@ -66,6 +66,7 @@ class injector {
 
         $enabled = get_config('local_proview', 'enabled');
         $string_match = get_config('local_proview', 'string_match');
+        $quizaccess_proctor_setting_enabled = get_config('quizaccess_proctor', 'enableproctor');
         if (!$enabled) {
             return;
         }
@@ -85,6 +86,13 @@ class injector {
             }
             if ($PAGE->cm) {
                 $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+                if ($quizaccess_proctor_setting_enabled) {
+                // if (\core_component::get_component_directory('quizaccess_proctor')) {
+                    $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('id' => $quiz->id));
+                    if ($quizaccess_proctor_setting) {
+                        $courselevelconfiguration = 4;
+                    }
+                }
                 switch ($courselevelconfiguration) {
                     case 1:      // Proview Enabled for complete course.
                         break;
@@ -103,6 +111,12 @@ class injector {
                     case 3:     // Proview disabled for complete course.
                         self::inject_password($PAGE, $quiz);
                         return;
+                        break;
+                    case 4:     // Additional Plugin Added for proctoring Settings.
+                        if ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor') {
+                            self::inject_password($PAGE, $quiz);
+                            return;
+                        }
                         break;
                     default:    // If course level configuration is not enabled then Quiz level configuration is enabled by default.
                         if ($quiz && $quiz->id) {
@@ -145,8 +159,14 @@ class injector {
                 if ($PAGE->cm) {
                     $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
                     // print $PAGE->url."\n";
-
-                    if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE) && strpos ($quiz->name, ('TSB')) !== FALSE && $_SERVER ['HTTP_USER_AGENT'] != "Proview-SB") {
+                    if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE 
+                            || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE) 
+                        && (($quizaccess_proctor_setting_enabled 
+                                && $quizaccess_proctor_setting->tsbenabled) 
+                            || (!$quizaccess_proctor_setting_enabled 
+                                && $string_match 
+                                && strpos ($quiz->name, ('[TSB]')) !== FALSE))
+                        && $_SERVER ['HTTP_USER_AGENT'] != "Proview-SB") {
                         // echo $_SERVER ['HTTP_USER_AGENT'];
                         $tsbURL = "tsb://".explode("://",$PAGE->url)[1];
                         if (!headers_sent()) {

@@ -61,6 +61,7 @@ $quizid = explode('=', explode('&', $query)[0])[1];
 $sesskey = explode('=', explode('&', $query)[1])[1];
 
 $template = new stdClass();
+$quizaccess_proctor_setting = null;
 if ($sesskey == sesskey()) {
     $quiz = $DB->get_record('quiz', array('id' => $quizid));      // Fetching current quiz data for password.
 
@@ -72,8 +73,15 @@ if ($sesskey == sesskey()) {
     } else {
         $attempt = $attempt->attempt;
     }
+    if (get_config('quizaccess_proctor', 'enableproctor')) {
+    // if (\core_component::get_component_directory('quizaccess_proctor')) {
+        $template->plugin_installed = true;
+        $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('id' => $quiz->id));
+    }
     $string_match = get_config('local_proview', 'string_match');
-    if ($string_match) {
+    if ($quizaccess_proctor_setting) {
+        $template->session_type = $quizaccess_proctor_setting->proctortype;
+    } elseif ($string_match) {
         $template->session_type = (strpos (json_encode($quiz->name), "[LP]") ? "live_proctor" : (strpos (json_encode($quiz->name), "[RR]") ? "record_and_review" : "ai_proctor"));
     } else {
         $template->session_type = "ai_proctor";
