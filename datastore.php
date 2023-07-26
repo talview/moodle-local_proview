@@ -76,7 +76,7 @@ if ($sesskey == sesskey()) {
     if (get_config('quizaccess_proctor', 'enableproctor')) {
     // if (\core_component::get_component_directory('quizaccess_proctor')) {
         $template->plugin_installed = true;
-        $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('id' => $quiz->id));
+        $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
     }
     $string_match = get_config('local_proview', 'string_match');
     if ($quizaccess_proctor_setting) {

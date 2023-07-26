@@ -88,7 +88,7 @@ class injector {
                 $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
                 if ($quizaccess_proctor_setting_enabled) {
                 // if (\core_component::get_component_directory('quizaccess_proctor')) {
-                    $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('id' => $quiz->id));
+                    $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
                     if ($quizaccess_proctor_setting) {
                         $courselevelconfiguration = 4;
                     }
