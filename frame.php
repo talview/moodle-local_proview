@@ -81,7 +81,15 @@ echo $OUTPUT->header();
     window.addEventListener("message", receiveMessage, false);
 
     //Javascript function to start proview invoked upon postMessage from iframe
-    function startProview(authToken, profileId, session, session_type = "ai_proctor", proview_url, skipHardwareTest, previewStyle, clear) {
+    function startProview(
+        authToken, 
+        profileId, 
+        session, 
+        session_type = "ai_proctor", 
+        proview_url, 
+        skipHardwareTest,
+        previewStyle, 
+        clear) {
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
@@ -127,7 +135,9 @@ echo $OUTPUT->header();
           }, childOrigin);
           
           let url = proview_url || '//cdn.proview.io/init.js';
-          url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/': (url.search('client')!=1 || url.search('v7')!=1) ? "https://appv7.proview.io/embedded/" : 'https://app.proview.io/embedded/') + id;
+          url = ((
+            url.search('v5')!=-1) ? 'https://appv5.proview.io/embedded/':(url.search('client')!=1 || url.search('v7')!=1) 
+            ? "https://appv7.proview.io/embedded/" : 'https://app.proview.io/embedded/') + id;
           const arr = {
             "user_id"       : profile_id,
             "quiz_id"       : urlParams.get('quizId'),
