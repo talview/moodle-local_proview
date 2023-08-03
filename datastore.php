@@ -45,7 +45,7 @@ if ($post && ($post->sesskey == sesskey())) {
         $response = $DB->insert_record('local_proview', [
                             "quiz_id" => $post->quiz_id,
                             "proview_url" => $post->proview_url,
-                            "user_id" => $post->user_id,
+                            "user_id" => $USER->id,
                             "attempt_no" => $attempt->id
                         ]);
         print $response;
