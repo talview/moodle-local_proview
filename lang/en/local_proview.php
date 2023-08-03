@@ -34,6 +34,8 @@ $string['token'] = 'Proctor Token';
 $string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
+$string['auto_password_injection_enabled'] = 'Automatic Password Injection';
+$string['auto_password_injection_enabled_desc'] = 'Enable Automatic Password Injection, Enabling this will auto inject quiz password if proview is enabled on admin level';
 $string['string_match'] = 'String Matching';
 $string['string_match_desc'] = 'Enable this setting to enable Proview on quiz level basis string matching on the Quiz title.<br />
 When this setting is enabled following checks will be performed on the quiz title.<br />

@@ -137,7 +137,7 @@ class injector {
             }
             // Logic for enabling proview for course level and quiz level ends.
 
-            if ($COURSE && $COURSE->id) {
+            if ($COURSE && $COURSE->id && get_config('local_proview', 'auto_password_injection_enabled')) {
                 // Logic for enabling specific user to use proctored assessment STARTS
                 // Fetching the group details for the proview_disabled group.
                 $groupdetails = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']);

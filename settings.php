@@ -41,6 +41,13 @@ if (is_siteadmin()) {
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $settings->add($setting);
 
+    $name = 'local_proview/auto_password_injection_enabled';
+    $title = get_string('auto_password_injection_enabled', 'local_proview');
+    $description = get_string('auto_password_injection_enabled_desc', 'local_proview');
+    $default = false;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $settings->add($setting);
+
     $name = 'local_proview/string_match';
     $title = get_string('string_match', 'local_proview');
     $description = get_string('string_match_desc', 'local_proview');
