@@ -137,8 +137,8 @@ class injector {
             }
             // Logic for enabling proview for course level and quiz level ends.
 
+            // Logic for enabling specific user to use proctored assessment STARTS
             if ($COURSE && $COURSE->id && get_config('local_proview', 'auto_password_injection_enabled')) {
-                // Logic for enabling specific user to use proctored assessment STARTS
                 // Fetching the group details for the proview_disabled group.
                 $groupdetails = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']);
 
@@ -157,36 +157,34 @@ class injector {
                     }
                 }
                 // Logic for enabling specific user to use proctored assessment ENDS.
-
-                // // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword STARTS
-                // if ($PAGE->cm) {
-                //     $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-                //     // print $PAGE->url."\n";
-                //     if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE 
-                //             || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE) 
-                //         && (($quizaccess_proctor_setting_enabled 
-                //                 && $quizaccess_proctor_setting->tsbenabled) 
-                //             || (!$quizaccess_proctor_setting_enabled 
-                //                 && $string_match 
-                //                 && strpos ($quiz->name, ('[TSB]')) !== FALSE))
-                //         && $_SERVER ['HTTP_USER_AGENT'] != "Proview-SB") {
-                //         // echo $_SERVER ['HTTP_USER_AGENT'];
-                //         $tsbURL = "tsb://".explode("://",$PAGE->url)[1];
-                //         if (!headers_sent()) {
-                //             header('Location: '.$tsbURL);
-                //         } else {
-                //             echo ("<script>location.href='$tsbURL'</script>");
-                //         }
-                //         die;
-                //     }
-                // }
-                // // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword ENDS
-                if (self::$injected) {
-                    return;
-                }
-                self::$injected = true;
             }
-
+            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword STARTS
+            if ($PAGE->cm) {
+                $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+                if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE
+                        || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE)
+                    && (($quizaccess_proctor_setting_enabled
+                            && $quizaccess_proctor_setting->tsbenabled)
+                        || (!$quizaccess_proctor_setting_enabled
+                            && $string_match
+                            && strpos ($quiz->name, ('[TSB]')) !== FALSE))
+                    && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB")  === FALSE ){
+                    $redirectURL = "tsb://".explode("://",$PAGE->url)[1];
+                    $tsbURL = "https://pages.talview.com/tsb?redirect_url=".$redirectURL."&user=".$_SERVER ['HTTP_USER_AGENT'];
+                    // $PAGE->requires->js_amd_inline("document.location.replace('" . $tsbURL . "')");
+                    if (!headers_sent()) {
+                        header('Location: '.$tsbURL);
+                    } else {
+                        echo ("<script>location.href='$tsbURL'</script>");
+                    }
+                    die;
+                }
+            }
+            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and quiz title contains TSB keyword ENDS
+            if (self::$injected) {
+                return;
+            }
+            self::$injected = true;
             $t = new api\tracker();
             $t::insert_tracking();
             return;
