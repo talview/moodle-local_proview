@@ -36,15 +36,6 @@ $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
 $string['auto_password_injection_enabled'] = 'Automatic Password Injection';
 $string['auto_password_injection_enabled_desc'] = 'Enable Automatic Password Injection, Enabling this will auto inject quiz password if proview is enabled on admin level';
-$string['string_match'] = 'String Matching';
-$string['string_match_desc'] = 'Enable this setting to enable Proview on quiz level basis string matching on the Quiz title.<br />
-When this setting is enabled following checks will be performed on the quiz title.<br />
-If the quiz title contains the "proctor" keyword (case insensitive) then Proview will be enabled for that quiz. <br />
-The following checks are performed if Proview is launched for the quiz:
-<ol>
-<li>If the quiz title contains the "[LP]" keyword (case sensitive) then Live Proctoring will be enabled for that quiz.</li>
-<li>If the quiz title contains the "[RR]" keyword (case sensitive) then Record and Review will be enabled for that quiz.</li>
-<li>If the quiz title contains the "[AI]" keyword (case sensitive) then AI Proctoring will be enabled for that quiz.</li> </ol>';
 $string['proview_acc_name'] = 'Proview Account Name';
 $string['proview_acc_name_desc'] = 'Account Name provided by Talview, If not provided use your organisation name.';
 $string['root_dir'] = 'Root Dir';

@@ -48,13 +48,6 @@ if (is_siteadmin()) {
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $settings->add($setting);
 
-    $name = 'local_proview/string_match';
-    $title = get_string('string_match', 'local_proview');
-    $description = get_string('string_match_desc', 'local_proview');
-    $default = true;
-    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
-    $settings->add($setting);
-
     $name = 'local_proview/token';
     $title = get_string('token', 'local_proview');
     $description = get_string('token_desc', 'local_proview');
