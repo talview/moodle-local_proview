@@ -85,18 +85,6 @@ class injector {
             }
             // Logic for enabling proview for course level and quiz level ends.
 
-            // Logic for adding instructions to proview for quiz level STARTS.
-            if ($PAGE->cm) {
-                $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-                $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
-                if ((!$quizaccess_proctor_setting) ||
-                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->instructions != '')) {
-                    self::inject_password($PAGE, $quiz);
-                    return;
-                }
-            }
-            // Logic for adding instructions to proview for quiz level ends.
-
             // Logic for enabling specific user to use proctored assessment STARTS
             if ($COURSE && $COURSE->id) {
                 // Fetching the group details for the proview_disabled group.

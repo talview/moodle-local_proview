@@ -87,6 +87,7 @@ echo $OUTPUT->header();
         session, 
         session_type = "ai_proctor", 
         proview_url, 
+        additionalInstruction,
         skipHardwareTest,
         previewStyle, 
         clear) {
@@ -101,6 +102,7 @@ echo $OUTPUT->header();
             profileId: profileId,
             session: session,
             session_type: session_type,
+            additionalInstruction: additionalInstruction,
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
@@ -219,7 +221,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url);
+              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions);
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);
