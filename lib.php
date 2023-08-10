@@ -21,24 +21,21 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Mani Ka <mani@talview.com>
+ * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses       die
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-use local_proview\injector;
+use local_proview\local\injector;
 
 /**
  * Output callback, available since Moodle 3.3
  *
  */
-function local_proview_before_footer() {
-    injector::inject();
-//    if(!headers_sent()){
-//        @header_remove('Feature-Policy');
-//        @header("Feature-Policy: vibrate 'none'; ambient-light-sensor 'none'; camera: '*';");
-//    }
+function local_proview_before_standard_top_of_body_html() {
+
 }
 
 /**
@@ -46,5 +43,13 @@ function local_proview_before_footer() {
  *
  */
 function local_proview_before_http_headers() {
+
+}
+
+/**
+ * Output callback, available since Moodle 3.3
+ *
+ */
+function local_proview_before_footer() {
     injector::inject();
 }

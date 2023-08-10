@@ -21,14 +21,19 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Mani Ka <mani@talview.com>
+ * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @uses       die
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2020031901;
-$plugin->requires = 2018051700;
-$plugin->release = '1.1 (Build: 2020031901)';
+$plugin->version  = 2023080701;
+$plugin->requires = 2020061500;
+$plugin->release = '3.0.0 (Build: 2023080701)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_proview';
+
+$plugin->dependencies = array(
+    'quizaccess_proctor' => ANY_VERSION,
+);

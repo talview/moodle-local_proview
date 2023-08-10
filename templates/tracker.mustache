@@ -25,65 +25,172 @@
     * none
 
     Context variables required for this template:
+    * enabled Boolean value defining Proview is enabled or not
     * token Proview token code
     * proview_url Plugin url
-    * session_id Session ID to track and map sessions with
+    * profile_id User Id of the candidate
+    * quiz_id Quiz Id of the Quiz
+    * current_attempt current Attempt no of the candidate for that quiz Eg: 1 for first attempt, 2 for second attempt.
+    * root_dir Root Directory of moodle installation
+    * quiz_password Quiz password if the quiz is password protected else null
+    * attempts All the records from local_proview table for a given quiz with attempt no as ket
 
     Example context (json):
-    { "token": U-9021015, "proview_url": '//cdn.proview.io/init.js','session_id': "U1234" }
+    {
+        "enabled": true,
+        "token": "token123",
+        "proview_url": "<Will contain the URL required for launching proview/ Plugin Url>",
+        "profile_id": 1,
+        "quiz_id": 1,
+        "current_attempt": 1,
+        "root_dir": "/moodle/",
+        "quiz_password": "pass123",
+        "attempts": {"85":{"attempt_no":"85","proview_url":"https:\/\/www.google.com"} },
+        "session_type": "ai_proctor"
+    }
 }}
 {{#js}}
     {{#enabled}}
+        function receiveMessage(event) {
+            if(event.data.type == 'startedProview') {
+                onProviewStart(...event.data.args);
+            }
+            if(event.data.type =='stoppedProview') {
+                console.log(event.data.url);
+                onProviewStop(event.data.url);
+            }
+        }
+        window.addEventListener("message", receiveMessage, false);
+        function startProviewOnParent() {
+            //postMessage to parent window to start proview
+            parent.postMessage({type: 'startProview'},childOrigin);
+        }
+
+        function onProviewStart(err,id) {
+            console.log('Proview Started: PlayBackID - ' + id );
+        }
+        function onProviewStop(url) {
+
+        }
         let current = window.location.href;
         let childOrigin = '*';  // can be location origin, replace with you domain
-        if(current.match('mod/quiz/(attempt|summary)') ){
+        if(current.match('mod/quiz/(attempt|summary)') ) {
+            $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
+                if( window.self != window.top) {
+                    parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+                }
+            })
             if( window.self == window.top) {
                 let params = new URLSearchParams({
                     url: current,
-                    token: '{{token}}',
-                    proview_url: '{{proview_url}}',
                     clear: false,
                     screen: false,
-                    profile: {{profile_id}}
+                    quizId : '{{quiz_id}}'
                 });
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
-            } else {
-
-                function receiveMessage(event) {
-                //  if (event.origin == childOrigin) {
-                    if(event.data.type == 'startedProview') {
-                      onProviewStart(...event.data.args);
-                    }
-
-                    if(event.data.type =='stoppedProview') {
-                      onProviewStop()
-                    }
-                  }
-                // }
-                window.addEventListener("message", receiveMessage, false);
-
-                function startProviewOnParent() {
-                  //postmessage to parent window to start proview
-                  parent.postMessage({type: 'startProview'},childOrigin);
-                }
-
-                function onProviewStart(err,id) {
-                  // alert('Proview Started: PlayBackID - ' + id );
-                }
-                $(".confirmation-buttons > input[type='button'].btn-primary").on('click',function (e) {
-                  parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
-                })
-
-                function onProviewStop() {
-
-                  // alert('Proview stopped');
-                }
             }
         }
-        if(!current.match('mod/quiz/(attempt|summary)') && window.self != window.top ){
-          parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+        if(current.match('mod/quiz/view') ) {
+            if(window.self != window.top && window.parent.previousUrl) { //checking if the request is coming from summary
+              var previousUrl = window.parent.previousUrl;
+              if(previousUrl.match('mod/quiz/(attempt|summary)') ) {
+                 parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+              }
+            }
+            let div = document.getElementsByClassName("singlebutton quizstartbuttondiv");
+            div[0].getElementsByTagName("*")[3].addEventListener("click", function(event){
+              $(".moodle-dialogue-base").hide();
+              if( window.self == window.top) {
+                let params = new URLSearchParams({
+                    url            : current,
+                    clear          : false,
+                    screen         : false,
+                    quizId         : '{{quiz_id}}'
+                });
+                window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
+            }
+            });
         }
 
-    {{/enabled}}
+        {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), STARTS }}
+        if(current.match('mod/quiz/report') ) {
+            let table = document.getElementById("attempts");
+            let thead = table.firstChild;
+            let tbody = table.lastChild;
+            let attempts = JSON.parse(`{{attempts}}`.replace(/&quot;/g,'"'));
+            let node = document.createElement("A");
+            node.setAttribute("href", "");
 
+            let parentNode = document.createElement("TH"); 
+            parentNode.setAttribute("scope", "col");
+            parentNode.setAttribute("class", `header c${thead.firstChild.children.length}`);
+
+            let textnode = document.createTextNode("Proview URL");
+
+            node.appendChild(textnode);   
+            parentNode.appendChild(node);
+            thead.firstChild.appendChild(parentNode);
+            for (let i = 0; i < tbody.children.length; i++) {
+                let attempt_id = tbody.children[i].firstChild.firstChild && tbody.children[i].firstChild.firstChild.value || null;
+                if(tbody.children[i].children.length == 1){                                     {{! Logic to handle last 2 rows of table and not append in hidden rows  }}
+                    tbody.children[i].firstChild.setAttribute("colspan",parseInt(tbody.children[i].firstChild.getAttribute('colspan'))+1);
+                    let emptyNode=document.createElement('TD');
+                    emptyNode.setAttribute("id", `mod-quiz-report-overview-report_r${i+1}_c${tbody.children[i+1].children.length}`);
+                    emptyNode.setAttribute("class", `cell c${tbody.children[i+1].children.length}`);
+                    tbody.children[i+1].appendChild(emptyNode);
+                    break;
+                }
+                textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||""); 
+
+                node = document.createElement("a");    
+                node.setAttribute("title", "Proview Link");
+                node.setAttribute("href", attempts[attempt_id]&&attempts[attempt_id].proview_url||"");
+                node.setAttribute("target", "proview");
+                node.addEventListener("click",()=>{                                             {{! Event to display I frame containing Proview admin }}
+                    table.setAttribute("style","display: none");
+                    modal.setAttribute("style","display: block");
+                })
+                node.appendChild(textnode);   
+
+                parentNode = document.createElement("TD");  
+                parentNode.setAttribute("id", `mod-quiz-report-overview-report_r${i}_c${tbody.children[i].children.length}`);
+                parentNode.setAttribute("class", `cell c${tbody.children[i].children.length}`);
+                parentNode.appendChild(node);                   
+                tbody.children[i].appendChild(parentNode);
+            }
+            {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), ENDS }}
+
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}   
+            var modal = document.createElement('div');
+            modal.setAttribute("id","modal");
+            modal.setAttribute("name","modal");
+            modal.setAttribute("style", "display: none;");
+            modal.setAttribute("align", "center");
+
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute("name", "proview");
+            iframe.setAttribute("style","height: 80vh; width: 100%;");
+
+            var close = document.createElement('div');
+            close.setAttribute("style","width: 100%;");
+            close.setAttribute("align","left");
+            close.innerHTML ='<span style="cursor: pointer">x</span>';
+            close.addEventListener("click", ()=>{
+                table.setAttribute("style","display: block");
+                modal.setAttribute("style","display: none");
+            });
+
+            modal.appendChild(close);
+            modal.appendChild(iframe);
+            table.parentNode.appendChild(modal);
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}   
+        }
+
+        if(current.match('mod/quiz/(attempt|summary)') && window.self != window.top) {
+            window.parent.previousUrl = window.location.href;
+        }
+        if(!current.match('mod/quiz/(attempt|summary|startattempt|view)') && window.self != window.top ) {
+          parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+        }
+    {{/enabled}}
 {{/js}}

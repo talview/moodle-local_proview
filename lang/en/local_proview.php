@@ -21,21 +21,40 @@
  *
  * @package    local_proview
  * @copyright  Talview, 2020
- * @author     Mani Ka <mani@talview.com>
+ * @author     Talview Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['pluginname'] = 'Proview';
 $string['proview_url'] = 'Proview Endpoint URL';
-$string['proview_url_desc'] = 'Enter the Proview End point URL ';
-$string['token'] = 'Proview Token';
-$string['token_desc'] = 'For example: U12345678';
+$string['proview_url_desc'] = 'Enter the Proview End point URL';
+$string['proview_playback_url'] = 'Proview Playback URL';
+$string['proview_playback_url_desc'] = 'Enter the Proview Playback URL provided by Talview';
+$string['token'] = 'Proctor Token';
+$string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
+$string['auto_password_injection_enabled'] = 'Automatic Password Injection';
+$string['auto_password_injection_enabled_desc'] = 'Enable Automatic Password Injection, Enabling this will auto inject quiz password if proview is enabled on admin level';
+$string['proview_acc_name'] = 'Proview Account Name';
+$string['proview_acc_name_desc'] = 'Account Name provided by Talview, If not provided use your organisation name.';
 $string['root_dir'] = 'Root Dir';
 $string['root_dir_desc'] = 'Root Dir';
 
-// /*
-//  * GDPR compliant
-//  */
-// $string['privacy:no_data_reason'] = "The local analytics plugin doesn't store any personal data.";
+
+$string['privacy:metadata:local_proview'] = 'This plugin is developed by the team at Talview Inc and implements “Proview” (which is a proctoring solution developed in Talview) in Moodle LMS.';
+$string['privacy:metadata:local_proview:user_id'] = 'The ID of the user who attempted the quiz.';
+$string['privacy:metadata:local_proview:quiz_id'] = 'The ID of the quiz the user attempted.';
+$string['privacy:metadata:local_proview:attempt_no'] = 'The current attempt no of the user for this quiz (No of tries for this quiz).';
+$string['privacy:metadata:local_proview:proview_url'] = 'The url to view and proctor the candidate attempt in proview admin interface.';
+
+$string['privacy:metadata:talview_proview'] = 'The plugin also stores the data out of moodle in Talview\'s Server.';
+$string['privacy:metadata:talview_proview:ipaddress'] = 'The IP Address of the user giving the test.';
+$string['privacy:metadata:talview_proview:candidate_video'] = 'Video is recorded and stored of the candidate while giving the exam.';
+$string['privacy:metadata:talview_proview:candidate_audio'] = 'Audio is recorded and stored of the candidate while giving the exam.';
+$string['privacy:metadata:talview_proview:candidate_photo'] = 'Photo is captured of candidate before the exam for validation.';
+$string['privacy:metadata:talview_proview:candidate_idcard'] = 'Candidate is asked to capture a photo of ID Card for validation before the exam.';
+$string['privacy:metadata:talview_proview:browser'] = 'Browser used by the candidate is captured for debugging purposes.';
+$string['privacy:metadata:talview_proview:operating_system'] = 'Operating System used by the candidate is captured for debugging purposes.';
+$string['privacy:metadata:talview_proview:profile_id'] = 'The user id of candidate is shared with proview as profile ID.';
+$string['privacy:metadata:talview_proview:session_id'] = 'The quiz id of the quiz is shared with proview along with current attempt as session ID.';
