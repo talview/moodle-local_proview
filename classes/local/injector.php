@@ -51,7 +51,7 @@ class injector {
      * @return null
      */
     private static function inject_password($PAGE, $quiz) {
-        if ($quiz->password) {                          // If the quiz is password protected then inject the js.
+        if ($quiz->password && get_config('local_proview', 'auto_password_injection_enabled')) {                          // If the quiz is password protected then inject the js.
             $PAGE->requires->js_call_amd('local_proview/proview', 'init', array($quiz->password));
         }
     }
@@ -63,56 +63,30 @@ class injector {
      */
     public static function inject() {
         global $USER, $COURSE, $DB, $PAGE;
-
-        $enabled = get_config('local_proview', 'enabled');
-        if (!$enabled) {
+        $page_path =  $PAGE->url->get_path();
+        if (!preg_match('/mod\/quiz\/(attempt|summary|startattempt|view|report)/',$page_path )) {
             return;
         }
-
+        $enabled = get_config('local_proview', 'enabled');
+        $quizaccess_proctor_setting_enabled = get_config('quizaccess_proctor', 'enableproctor');
+        if (!$enabled || !$quizaccess_proctor_setting_enabled) {
+            return;
+        }
         // Logic for enabling proview for course level and quiz level starts.
         try {
-            $list = new \core_course_list_element($COURSE);
-            $datas = $list->get_custom_fields();
-            $courselevelconfiguration = 0;                   // Field for storing course level configuration.
-            foreach ($datas as $data) {
-                if (empty($data->get_value())) {
-                    continue;
-                }
-                if (strpos(($data->get_field()->get('name')), "Proview Configuration") !== false) {
-                    $courselevelconfiguration = $data->get_value();
-                }
-            }
             if ($PAGE->cm) {
                 $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-                switch ($courselevelconfiguration) {
-                    case 1:      // Proview Enabled for complete course.
-                        break;
-                    case 2:      // Proview Enabled for specific quizes.
-                        if ($quiz && $quiz->id) {
-                            if (!stripos (json_encode($quiz->name), "Proctor")) {
-                                self::inject_password($PAGE, $quiz);
-                                return;
-                            }
-                        }
-                        break;
-                    case 3:     // Proview disabled for complete course.
-                        self::inject_password($PAGE, $quiz);
-                        return;
-                        break;
-                    default:    // If course level configuration is not enabled then Quiz level configuration is enabled by default.
-                        if ($quiz && $quiz->id) {
-                            if (!stripos (json_encode($quiz->name), "Proctor")) {
-                                self::inject_password($PAGE, $quiz);
-                                return;
-                            }
-                        }
-                        break;
+                $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
+                if ((!$quizaccess_proctor_setting) ||
+                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor')) {
+                    self::inject_password($PAGE, $quiz);
+                    return;
                 }
             }
             // Logic for enabling proview for course level and quiz level ends.
 
+            // Logic for enabling specific user to use proctored assessment STARTS
             if ($COURSE && $COURSE->id) {
-                // Logic for enabling specific user to use proctored assessment STARTS
                 // Fetching the group details for the proview_disabled group.
                 $groupdetails = $DB->get_record('groups', ['courseid' => $COURSE->id, 'name' => 'proview_disabled']);
 
@@ -131,12 +105,31 @@ class injector {
                     }
                 }
                 // Logic for enabling specific user to use proctored assessment ENDS.
-                if (self::$injected) {
-                    return;
-                }
-                self::$injected = true;
             }
-
+            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and TSB is enabled STARTS
+            if ($PAGE->cm) {
+                $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+                if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE
+                        || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE)
+                    && ($quizaccess_proctor_setting_enabled
+                            && $quizaccess_proctor_setting->tsbenabled)
+                    && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB")  === FALSE ){
+                    $redirectURL = "tsb://".explode("://",$PAGE->url)[1];
+                    $tsbURL = "https://pages.talview.com/tsb/index.html?redirect_url=".$redirectURL."&user=".$_SERVER ['HTTP_USER_AGENT'];
+                    // $PAGE->requires->js_amd_inline("document.location.replace('" . $tsbURL . "')");
+                    if (!headers_sent()) {
+                        header('Location: '.$tsbURL);
+                    } else {
+                        echo ("<script>location.href='$tsbURL'</script>");
+                    }
+                    die;
+                }
+            }
+            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and TSB is enabled ENDS
+            if (self::$injected) {
+                return;
+            }
+            self::$injected = true;
             $t = new api\tracker();
             $t::insert_tracking();
             return;

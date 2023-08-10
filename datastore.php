@@ -45,7 +45,7 @@ if ($post && ($post->sesskey == sesskey())) {
         $response = $DB->insert_record('local_proview', [
                             "quiz_id" => $post->quiz_id,
                             "proview_url" => $post->proview_url,
-                            "user_id" => $post->user_id,
+                            "user_id" => $USER->id,
                             "attempt_no" => $attempt->id
                         ]);
         print $response;
@@ -61,6 +61,7 @@ $quizid = explode('=', explode('&', $query)[0])[1];
 $sesskey = explode('=', explode('&', $query)[1])[1];
 
 $template = new stdClass();
+$quizaccess_proctor_setting = null;
 if ($sesskey == sesskey()) {
     $quiz = $DB->get_record('quiz', array('id' => $quizid));      // Fetching current quiz data for password.
 
@@ -72,12 +73,21 @@ if ($sesskey == sesskey()) {
     } else {
         $attempt = $attempt->attempt;
     }
-
+    if (get_config('quizaccess_proctor', 'enableproctor')) {
+    // if (\core_component::get_component_directory('quizaccess_proctor')) {
+        $template->plugin_installed = true;
+        $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
+    }
+    if (!$quizaccess_proctor_setting) {
+        $template->session_type = $quizaccess_proctor_setting->proctortype;
+    } else {
+        $template->session_type = "ai_proctor";
+    }
     $template->quiz_password = ($quiz->password ? $quiz->password : null);
     $template->profile_id = $USER->id;
-    $template->session_id = $quizid.'-'.$attempt;
-    $template->proview_url = get_config('local_proview', 'proview_url');
-    $template->token = get_config('local_proview', 'token');
+    $template->session_id = $template->session_type === "live_proctor" ? $quizid.'-'.$USER->id : $quizid.'-'.$USER->id.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
+    $template->proview_url = trim(get_config('local_proview', 'proview_url'));
+    $template->token = trim(get_config('local_proview', 'token'));
     echo json_encode($template);
     return;
 }

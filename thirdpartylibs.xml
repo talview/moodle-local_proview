@@ -9,7 +9,7 @@
     <library>
         <location>vendor</location>
         <name>sentry</name>
-        <version>^2.1</version>
+        <version>^3.5</version>
         <license>Apache</license>
         <licenseversion>2.0</licenseversion>
     </library>

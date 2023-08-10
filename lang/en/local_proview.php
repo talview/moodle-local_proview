@@ -27,11 +27,15 @@
 
 $string['pluginname'] = 'Proview';
 $string['proview_url'] = 'Proview Endpoint URL';
-$string['proview_url_desc'] = 'Enter the Proview End point URL ';
-$string['token'] = 'Proview Token';
+$string['proview_url_desc'] = 'Enter the Proview End point URL';
+$string['proview_playback_url'] = 'Proview Playback URL';
+$string['proview_playback_url_desc'] = 'Enter the Proview Playback URL provided by Talview';
+$string['token'] = 'Proctor Token';
 $string['token_desc'] = 'For example: U9021015';
 $string['enabled'] = 'Enabled';
 $string['enabled_desc'] = 'Enable Proview for Moodle';
+$string['auto_password_injection_enabled'] = 'Automatic Password Injection';
+$string['auto_password_injection_enabled_desc'] = 'Enable Automatic Password Injection, Enabling this will auto inject quiz password if proview is enabled on admin level';
 $string['proview_acc_name'] = 'Proview Account Name';
 $string['proview_acc_name_desc'] = 'Account Name provided by Talview, If not provided use your organisation name.';
 $string['root_dir'] = 'Root Dir';
