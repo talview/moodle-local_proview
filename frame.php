@@ -81,7 +81,15 @@ echo $OUTPUT->header();
     window.addEventListener("message", receiveMessage, false);
 
     //Javascript function to start proview invoked upon postMessage from iframe
-    function startProview(authToken, profileId, session, proview_url, skipHardwareTest, previewStyle, clear) {
+    function startProview(
+        authToken, 
+        profileId, 
+        session, 
+        session_type = "ai_proctor", 
+        proview_url, 
+        skipHardwareTest,
+        previewStyle, 
+        clear) {
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
@@ -92,6 +100,7 @@ echo $OUTPUT->header();
         tv('init', authToken,{
             profileId: profileId,
             session: session,
+            session_type: session_type,
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
@@ -126,7 +135,9 @@ echo $OUTPUT->header();
           }, childOrigin);
           
           let url = proview_url || '//cdn.proview.io/init.js';
-          url = ((url.search('v5')!=-1)?'https://appv5.proview.io/embedded/':'https://app.proview.io/embedded/') + id;
+          url = ((
+            url.search('v5')!=-1) ? 'https://appv5.proview.io/embedded/':(url.search('client')!=1 || url.search('v7')!=1) 
+            ? "https://appv7.proview.io/embedded/" : 'https://app.proview.io/embedded/') + id;
           const arr = {
             "user_id"       : profile_id,
             "quiz_id"       : urlParams.get('quizId'),
@@ -208,7 +219,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(response.token, response.profile_id, response.session_id, response.proview_url);
+              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url);
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);

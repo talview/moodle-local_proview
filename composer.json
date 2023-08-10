@@ -4,9 +4,15 @@
     "description":"Plugin to enable Talview's Proview proctoring solution on Moodle.",
     "require": {
         "composer/installers": "~1.0",
-        "sentry/sdk": "^2.1"
+        "sentry/sdk": "^3.5"
     },
     "extra": {
         "installer-name": "proview"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "php-http/discovery": true
+        }
     }
 }
