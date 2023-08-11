@@ -86,6 +86,7 @@ if ($sesskey == sesskey()) {
     $template->quiz_password = ($quiz->password ? $quiz->password : null);
     $template->profile_id = $USER->id;
     $template->instructions = $quizaccess_proctor_setting->instructions;
+    $template->reference_link= $quizaccess_proctor_setting->reference_link;
     $template->session_id = $template->session_type === "live_proctor" ? $quizid.'-'.$USER->id : $quizid.'-'.$USER->id.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
     $template->proview_url = trim(get_config('local_proview', 'proview_url'));
     $template->token = trim(get_config('local_proview', 'token'));
