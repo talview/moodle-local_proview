@@ -78,7 +78,7 @@ if ($sesskey == sesskey()) {
         $template->plugin_installed = true;
         $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
     }
-    if (!$quizaccess_proctor_setting) {
+    if ($quizaccess_proctor_setting) {
         $template->session_type = $quizaccess_proctor_setting->proctortype;
     } else {
         $template->session_type = "ai_proctor";
