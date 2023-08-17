@@ -114,11 +114,11 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: createCallback(proview_url, profileId)/* onProviewStart */
+            initCallback: createCallback(proview_url, profileId, session_type)/* onProviewStart */
       });
     }
 
-    function createCallback (proview_url, profile_id) {
+    function createCallback (proview_url, profile_id, session_type) {
       return function onProviewStart(err, id) {
         try {
           const urlParams = new URLSearchParams(window.location.search);
@@ -152,7 +152,8 @@ echo $OUTPUT->header();
             "user_id"       : profile_id,
             "quiz_id"       : urlParams.get('quizId'),
             "proview_url"   : url,
-            "sesskey"       : "<?php echo $sesskey ?>"
+            "sesskey"       : "<?php echo $sesskey ?>",
+              "proctor_type" : session_type
           }
           const xmlhttp = new XMLHttpRequest();
           
