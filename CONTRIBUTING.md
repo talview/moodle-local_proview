@@ -23,7 +23,7 @@ contribute in a positive and respectful manner.
 
 You can contribute to the Proview - Moodle (local-proview) Plugin in the following ways:
 
-- Reporting issues or bugs on the [Issue tracker](https://github.com/talview/moodle-local_proview/pulls)
+- Reporting issues or bugs on the [Issue tracker](https://github.com/talview/moodle-local_proview/issues)
 - Suggesting new features or enhancements
 - Improving documentation
 - Writing code improvements or fixes
