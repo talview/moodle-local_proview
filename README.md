@@ -1,92 +1,112 @@
-# Introduciton | `moodle-local_proview` - 
+# Introduciton | `moodle-local_proview`
 
-A local Moodle Module adding Proview integration to Moodle.
+The Proview plugin, developed by Talview Inc., integrates the "Proview" proctoring solution into Moodle LMS.
+This plugin continuously evolves with frequent feature enhancements.
+The plugin captures and securely stores the candidate's video during an exam.
 
-This plugin is developed by the team at Talview Inc and implements “Proview” (which is a proctoring solution developed in Talview) in Moodle LMS. It is an ever growing solution with regular new feature enhancements. The plugin will capture and store the candidate's video while the candidate attempts an exam.
+**Note:**
+1. This plugin is free to download but a subscription is needed to make full use of it. For any query on subscription or to get a user token please raise a ticket [here](https://proviewsupport.freshdesk.com/support/tickets/new).
+2. Before installing this plugin, ensure the quizaccess_proctor plugin is installed. Refer to the Installation Guide [here](https://github.com/talview/moodle-quizaccess_proctor).
 
-***Note:** This plugin is free to download but a subscription is needed to make full use of it. For any query on subscription or to get a user token please raise a ticket on: “<https://proviewsupport.freshdesk.com/support/tickets/new>”.*
+## About Proview
+
+---
+
+Proview is an automated cognitive remote proctoring solution developed by Talview to promote equal career opportunities and create a fair assessment environment. It eliminates scheduling and location constraints by providing fully secure and authenticated tests that can be taken anytime, anywhere.
+
+Using advanced video and audio analytics, Proview monitors the candidate's activities during the test, ensuring their focus remains on the test screen. It also detects suspicious objects in the video and analyzes background voice activity to identify potential test irregularities.
+
+Administrators have the ability to monitor students taking the test from their preferred location. A comprehensive log of browser activity and audio-visual responses is provided. Proview disables the copy/paste function during the exam to prevent cheating.
+
+In contrast to other tools available in the market, Proview captures candidates' complete audio and video feeds throughout the test to detect any suspicious activity and raise alerts. The "Proview index" indicates the candidate's sincerity and engagement during the exam.
+
+For more information about Proview and frequently asked questions about the plugin and Proview, please visit "**https://proviewsupport.freshdesk.com/support/solutions**".
+
 
 ## Installation
 
 ---
 
--   In the admin view go to Site Administration -> Plugins -> Install Plugin.
+1. Access the admin view and navigate to Site Administration -> Plugins -> Install Plugin.
+2. Download the latest release from https://github.com/talview/moodle-local_proview/releases .
+3. Click on "Install the plugin" and follow the subsequent pages to complete the installation process.
+4. On the plugin settings page, perform the following steps:
+5. Enable Proview by checking the checkbox (Default Disabled).
+6. Enter the Proctor Token provided by Talview (subscription based).
+7. Enter the CDN URL provided by Talview (subscription based).
+8. Enter the Proview Admin URL provided by Talview e.g., https://appv7.proview.io/embedded.
+9. Enter the Account Name provided by Talview.
+10. Update the root_dir to match the root directory of your Moodle installation.  
+**Note**: The root directory refers to the directory where Moodle is installed. If you access Moodle using a URL like 'https://example.domain.com/,’ the root directory is '/,’ and no additional configuration is required. However, if you access Moodle using a URL like 'https://example.domain.com/moodle/,’ the root directory is '/moodle/' and must be configured accordingly in the root_dir field during the Proview installation process.
 
--   Download the plugin from Moodle Plugin Directory.
+The installation process is now complete.
 
--   Click on “Install the plugin”. You will be directed through some pages, follow the steps.
+**Note**: While the plugin is installed, please share the domain name in which Moodle is hosted for the test takers with Talview to do domain whitelisting.
 
--   “On the plugin settings page”
-    -   Click on Checkbox to enable Proview (Default Disabled).
-
-    -   Enter the User Token shared by Talview (subscription based).
-
-    -   Enter the cdn provided by Talview (subscription based).
-
-    -   Change the root_dir to root directory of your moodle installation.</br>
-    *(Root directory is the directory where moodle is installed. If you can access moodle with a URL like this '<https://example.domain.com/>' then the directory is '/' and no configuration is required. If you access moodle with a URL like '<https://example.domain.com/moodle/>' then '/moodle/' is the root directory and the same needs to be configured in the root_dir field when installing proview.)*
-
--   Installation Completed.
+**Steps to upgrade the plugin:**  
+In the admin view, go to Site Administration -> Plugins -> Install Plugin.  
+Download the latest release from https://github.com/talview/moodle-local_proview/releases.  
+Click on “Install the plugin.”. You will be directed through some pages; follow the steps.
+Plugin Upgraded.
 
 ## Post Installation Steps
 
 ---
 
-There are some plugin features to enable which user has to make some custom configuration. List of such features:
+### Custom Configuration for Plugin Features
 
--   Course Level Configuration: Enable/Disable Proview for specific courses.
--   Quiz Level Configuration: Enable Proview for specific quizzes. *(This is the default configuration, and will be used if no manual configuration is made by Admin.)*
--   Proview Disabled group: Disable Proview for specific candidates in a course.
+Several plugin features require custom configuration. Here is a list of these features:
 
-### Configurations to enable above mentioned features
+### Disable Proview For A Group
 
--   **Course Level Configuration:**
-    -   Go to Site Administration -> Courses -> Course Custom Fields and select “Add a New Category”.
+Disable Proview for specific candidates in a course.
 
-    -   Rename “Other Fields” to “Proview”.
-   
-    -   Click on “Add a new Custom Field” and select “Dropdown Menu”.
-   
-    -   Put the name as “Proview Configuration”.
-   
-    -   Short name as “proview_configuration”.
-   
-    -   Menu Options (Nested under Dropdown menu field Settings) as
-        -   Always On
-        -   Quiz Level Configuration
-        -   Always Off</br> ***Note:** Each value should be in a separate line and this order should be maintained.*
-    -   Set Default value as “Always On”.
-   
-    -   Set “Locked” as “No” and “Visible to” as “Everyone”.
-   
-    -   After the changes are saved go to any Course.
-   
-    -   On the Right Hand Side click on Settings Icon and click on “Edit Settings”.
-   
-    -   Scroll to the bottom of the page and open Proview Category.
-   
-    -   Here you can select the Course Level Configuration from three given options:
-        -   Always On: Enable Proview for complete course.
-        -   Quiz Level Configuration: Enable Proview for specific quizzes in this course.
-        -   Always Off: Disable Proview for complete course.
+1. Go to the specific course and navigate to Participants.
+2. Click the Settings Icon on the Right Hand Side and choose "Groups."
+3. Select "Create Group."
+4. Set the group name as "proview_disabled."
+5. Return to the course, click the Settings Icon on the Right Hand Side, then select "Edit Settings."
+    - Note: Any candidate added to this group will not have Proview enabled for them in this course.
 
--   **Quiz Level Configuration:** If you have not made the configuration required for course level configuration of Proview then this is the default configuration of Proview. This is also the expected behaviour from proview if you have enabled “Quiz Level Configuration” in “Course Level Configuration”.</br>
-As the name suggests, in this configuration Proview is enabled for specific quizzes. To enable Proview in a specific quiz you need to rename the quiz such that the quiz name contains the keyword “proctor” in any form. It is case insensitive and can be appended to any other word. Some valid examples: Proctored Quiz, Quiz Proctoring, Quizproctor, Proctorquiz, proctor, PROCTOR1234 etc.</br></br>
-***Note:** “Unproctored quiz” is also a valid name and proview will launch for that quiz (since the name contains the keyword “proctor”), even though the name is contradictory.*
+### Configure Proctoring Type For A Quiz
 
--   **Proview Disabled Group:** This is a user group which has to be created for each course in which you have specific candidates for whom proview should not load.
-    -   Go to the specific course and then go to Participants.
+Launching specific types of Proview (AI Proctor / Live Proctoring / Record and Review).
+- Select one of the following values from “Proview Proctoring Session” -> “Select Proctoring Type” within the quiz settings window to set up a specific proctoring type. The supported proctoring types are outlined below; their availability is subscription-based:
+    - No Proctoring: Neither Proctoring nor Talview Secure Browser will be enabled for the quiz.
+    - AI Proctoring: Sessions are assessed by an AI engine, generating an automated Proview Score. Choose AI Proctoring from the dropdown values.
+    - Record and Review: Completed sessions are reviewed by a proctor, who assigns a Proview Rating. Opt for Record and Review Proctoring in the dropdown values.
+    - Live Proctoring: Proctors assess ongoing sessions and can interact with candidates if needed. The proctor provides the Proview rating. Select Live Proctoring from the dropdown values.
+    - Note: For Live Proctoring, ensure slots are booked, or the schedule is shared with Talview.
 
-    -   Click the Settings Icon on the Right Hand Side and select “Groups”.
+### Configure Talview Secure Browser (TSB) For A Quiz
 
-    -   Click on “Create Group”.
+Talview Secure Browser (TSB): TSB is a secure browser compatible with Windows and Mac devices. Enabling TSB compels candidates to use TSB for exams.
 
-    -   Set the group name as “proview_disabled”.
+1. TSB Activation: Once enabled, candidates are directed to an external page to download the latest TSB version and launch the exam.
+2. TSB Configuration: Enforce TSB by selecting the checkbox “Proview Proctoring Session” -> “Enable Talview Secure Browser” within the quiz settings window.
 
-    -   Go to the course again and click on the Settings Icon on the Right Hand Side” and select “edit settings”.
-    
-    -   Scroll down to “Groups” category and set group mode as “Seperate Groups”.</br>
-    *Now any candidate you add in this group will not have proview enabled for them in this course.* 
+### Viewing the Proctor Session
+
+The proctor session and the generated Proview rating for each candidate can be viewed on the Proview Admin page. Additionally, this information is accessible within Moodle.
+
+To locate the Proview URL associated with each candidate's attempt for a specific quiz, follow these steps:
+
+1. Access the specific quiz.
+2. Go to Settings -> Grades (Nested under Results).
+3. The Proview URL will be listed at the end of the table under the column "Proview URL.”
+4. Clicking on the proctor link will open the Proview admin interface for that candidate's attempt within Moodle.
+
+### Uninstall Plugin
+
+Follow these steps to uninstall the plugin:
+
+1. Access the admin view and navigate to Site Administration -> Plugins -> Plugin Overview.
+2. Scroll down to the bottom of the page and locate Proview (nested under Local Plugins).
+3. Click on "Uninstall".
+    - Note: Uninstalling the plugin will not automatically remove manually configured settings. Any manual configurations must be removed separately. Failing to remove these configurations will not impact the Moodle workflow or the reinstallation of the plugin.
+
+**Important:** Uninstalling Proview will delete the data (mapping between candidate attempts and Proview admin) from the Moodle database but not from Talview's server. If you reinstall the plugin, the data will not be restored in Moodle's database.
+
 
 ## Terms and Conditions
 
@@ -107,3 +127,9 @@ Violation of any part of the Terms of Service will result in termination of your
 -   [x] Switch off Proview for some quizzes
 -   [x] Integrated playback component into moodle admin view
 -   [ ] Candidate ID Correlation
+-   [x] Proview V7+ support (AI, RR, LP)
+-   [x] Talview Secure Browser support
+-   [x] Integrate [Quizaccess_Proctor Plugin](https://github.com/talview/moodle-quizaccess_proctor)
+-   [ ] Secure Proctor Link
+-   [ ] Moodle 4.x support
+-   [ ] Merge Quizaccess_Proctor Plugin

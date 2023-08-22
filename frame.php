@@ -81,15 +81,23 @@ echo $OUTPUT->header();
     window.addEventListener("message", receiveMessage, false);
 
     //Javascript function to start proview invoked upon postMessage from iframe
+
+
     function startProview(
         authToken, 
         profileId, 
         session, 
         session_type = "ai_proctor", 
         proview_url, 
+        additionalInstruction,
+        reference_link,
         skipHardwareTest,
         previewStyle, 
         clear) {
+        const referenceLinksArray = reference_link.split('\r\n').map(link => {
+            const [url, caption] = link.split(':');
+            return { 'url': url, 'caption': caption };
+        });
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
@@ -101,6 +109,8 @@ echo $OUTPUT->header();
             profileId: profileId,
             session: session,
             session_type: session_type,
+            additionalInstruction: additionalInstruction,
+            referenceLinks: referenceLinksArray,
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
@@ -219,7 +229,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url);
+              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions, response.reference_link);
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);
