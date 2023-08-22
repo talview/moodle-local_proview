@@ -1,4 +1,4 @@
-# Introduciton | `moodle-local_proview` -
+# Introduciton | `moodle-local_proview`
 
 The Proview plugin, developed by Talview Inc., integrates the "Proview" proctoring solution into Moodle LMS.
 This plugin continuously evolves with frequent feature enhancements.
