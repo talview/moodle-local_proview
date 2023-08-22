@@ -6,7 +6,7 @@ The plugin captures and securely stores the candidate's video during an exam.
 
 **Note:**
 1. This plugin is free to download but a subscription is needed to make full use of it. For any query on subscription or to get a user token please raise a ticket [here](https://proviewsupport.freshdesk.com/support/tickets/new).
-2. Before installing this plugin, ensure the quizaccess_proctor plugin is installed. Refer to the Installation Guide [here](https://proviewsupport.freshdesk.com/support/solutions/articles/81000411877).
+2. Before installing this plugin, ensure the quizaccess_proctor plugin is installed. Refer to the Installation Guide [here](https://github.com/talview/moodle-quizaccess_procto).
 
 ## About Proview
 
@@ -28,7 +28,7 @@ For more information about Proview and frequently asked questions about the plug
 ---
 
 1. Access the admin view and navigate to Site Administration -> Plugins -> Install Plugin.
-2. Download the plugin from https://assets.talview.com/moodle-plugin/v3.0.0/proview.zip (latest version V3.0.0).
+2. Download the latest release from https://github.com/talview/moodle-local_proview/releases .
 3. Click on "Install the plugin" and follow the subsequent pages to complete the installation process.
 4. On the plugin settings page, perform the following steps:
 5. Enable Proview by checking the checkbox (Default Disabled).
@@ -36,7 +36,8 @@ For more information about Proview and frequently asked questions about the plug
 7. Enter the CDN URL provided by Talview (subscription based).
 8. Enter the Proview Admin URL provided by Talview e.g., https://appv7.proview.io/embedded.
 9. Enter the Account Name provided by Talview.
-10. Update the root_dir to match the root directory of your Moodle installation. Note: The root directory refers to the directory where Moodle is installed. If you access Moodle using a URL like 'https://example.domain.com/,’ the root directory is '/,’ and no additional configuration is required. However, if you access Moodle using a URL like 'https://example.domain.com/moodle/,’ the root directory is '/moodle/' and must be configured accordingly in the root_dir field during the Proview installation process.
+10. Update the root_dir to match the root directory of your Moodle installation.  
+**Note**: The root directory refers to the directory where Moodle is installed. If you access Moodle using a URL like 'https://example.domain.com/,’ the root directory is '/,’ and no additional configuration is required. However, if you access Moodle using a URL like 'https://example.domain.com/moodle/,’ the root directory is '/moodle/' and must be configured accordingly in the root_dir field during the Proview installation process.
 
 The installation process is now complete.
 
@@ -44,7 +45,7 @@ The installation process is now complete.
 
 **Steps to upgrade the plugin:**  
 In the admin view, go to Site Administration -> Plugins -> Install Plugin.  
-Download the plugin from https://assets.talview.com/moodle-plugin/v3.0.0/proview.zip (latest version V3.0.0).  
+Download the latest release from https://github.com/talview/moodle-local_proview/releases.  
 Click on “Install the plugin.”. You will be directed through some pages; follow the steps.
 Plugin Upgraded.
 
@@ -126,3 +127,9 @@ Violation of any part of the Terms of Service will result in termination of your
 -   [x] Switch off Proview for some quizzes
 -   [x] Integrated playback component into moodle admin view
 -   [ ] Candidate ID Correlation
+-   [x] Proview V7+ support (AI, RR, LP)
+-   [x] Talview Secure Browser support
+-   [x] Integrate [Quizaccess_Proctor Plugin](https://github.com/talview/moodle-quizaccess_proctor)
+-   [ ] Secure Proctor Link
+-   [ ] Moodle 4.x support
+-   [ ] Merge Quizaccess_Proctor Plugin
