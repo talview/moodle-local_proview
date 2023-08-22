@@ -6,7 +6,7 @@ The plugin captures and securely stores the candidate's video during an exam.
 
 **Note:**
 1. This plugin is free to download but a subscription is needed to make full use of it. For any query on subscription or to get a user token please raise a ticket [here](https://proviewsupport.freshdesk.com/support/tickets/new).
-2. Before installing this plugin, ensure the quizaccess_proctor plugin is installed. Refer to the Installation Guide [here](https://github.com/talview/moodle-quizaccess_procto).
+2. Before installing this plugin, ensure the quizaccess_proctor plugin is installed. Refer to the Installation Guide [here](https://github.com/talview/moodle-quizaccess_proctor).
 
 ## About Proview
 
