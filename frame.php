@@ -91,6 +91,7 @@ echo $OUTPUT->header();
         proview_url, 
         additionalInstruction,
         reference_link,
+        proview_playback_url,
         skipHardwareTest,
         previewStyle, 
         clear) {
@@ -114,11 +115,11 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: createCallback(proview_url, profileId)/* onProviewStart */
+            initCallback: createCallback(proview_playback_url, profileId)/* onProviewStart */
       });
     }
 
-    function createCallback (proview_url, profile_id) {
+    function createCallback (proview_playback_url, profile_id) {
       return function onProviewStart(err, id) {
         try {
           const urlParams = new URLSearchParams(window.location.search);
@@ -143,15 +144,11 @@ echo $OUTPUT->header();
               id     // Playback ID
             ]
           }, childOrigin);
-          
-          let url = proview_url || '//cdn.proview.io/init.js';
-          url = ((
-            url.search('v5')!=-1) ? 'https://appv5.proview.io/embedded/':(url.search('client')!=1 || url.search('v7')!=1) 
-            ? "https://appv7.proview.io/embedded/" : 'https://app.proview.io/embedded/') + id;
+
           const arr = {
             "user_id"       : profile_id,
             "quiz_id"       : urlParams.get('quizId'),
-            "proview_url"   : url,
+            "proview_url"   : proview_playback_url+'/'+id,
             "sesskey"       : "<?php echo $sesskey ?>"
           }
           const xmlhttp = new XMLHttpRequest();
@@ -229,7 +226,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions, response.reference_link);
+              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions, response.reference_link, response.proview_playback_url);
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);
