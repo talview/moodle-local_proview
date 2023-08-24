@@ -96,7 +96,7 @@ echo $OUTPUT->header();
         previewStyle, 
         clear) {
         const referenceLinksArray = reference_link.split('\r\n').map(link => {
-            const [url, caption] = link.split(':');
+            const [url, caption] = link.split('::');
             return { 'url': url, 'caption': caption };
         });
       let url = proview_url || '//cdn.proview.io/init.js';
@@ -111,7 +111,7 @@ echo $OUTPUT->header();
             session: session,
             session_type: session_type,
             additionalInstruction: additionalInstruction,
-            referenceLinks: referenceLinksArray,
+            referenceLinks: JSON.stringify(referenceLinksArray),
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
