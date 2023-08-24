@@ -35,5 +35,5 @@ $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_proview';
 
 $plugin->dependencies = array(
-    'quizaccess_proctor' => ANY_VERSION,
+    'quizaccess_proctor' => 2023082401,
 );
