@@ -91,10 +91,10 @@ function xmldb_local_proview_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
         if ($dbman->field_exists($table, $field)) {
-            $records = $DB->get_records('local-proview');
+            $records = $DB->get_records('local_proview');
             foreach ($records as $record) {
                 $record->proctor_type = '';
-                $DB->update_record('local-proview', $record);
+                $DB->update_record('local_proview', $record);
             }
         }
 
