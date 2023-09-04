@@ -115,7 +115,7 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: createCallback(proview_playback_url, profileId)/* onProviewStart */
+            initCallback: createCallback(proview_playback_url, profileId,session_type)/* onProviewStart */
       });
     }
 
