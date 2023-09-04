@@ -46,7 +46,8 @@ if ($post && ($post->sesskey == sesskey())) {
                             "quiz_id" => $post->quiz_id,
                             "proview_url" => $post->proview_url,
                             "user_id" => $USER->id,
-                            "attempt_no" => $attempt->id
+                            "attempt_no" => $attempt->id,
+                            "proctor_type" => $post->proctor_type,
                         ]);
         print $response;
         return;
@@ -90,6 +91,7 @@ if ($sesskey == sesskey()) {
     $template->session_id = $template->session_type === "live_proctor" ? $quizid.'-'.$USER->id : $quizid.'-'.$USER->id.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
     $template->proview_url = trim(get_config('local_proview', 'proview_url'));
     $template->token = trim(get_config('local_proview', 'token'));
+    $template->proview_playback_url = rtrim(trim(get_config('local_proview', 'proview_playback_url')), '/');
     echo json_encode($template);
     return;
 }
