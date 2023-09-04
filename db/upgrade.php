@@ -80,26 +80,23 @@ function xmldb_local_proview_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020082401, 'local', 'proview');
     }
 
-    if ($oldversion < 2023090401) {
+    if ($oldversion < 2023090402) {
 
         // Define field proctor_type to be added to local_proview.
         $table = new xmldb_table('local_proview');
         $field = new xmldb_field('proctor_type', XMLDB_TYPE_TEXT, null, null, null, null, null, 'attempt_no');
 
-        // Conditionally launch add field proctor_type.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
         if ($dbman->field_exists($table, $field)) {
             $records = $DB->get_records('local_proview');
             foreach ($records as $record) {
-                $record->proctor_type = '';
+                $record->proctor_type = $DB->get_record('quizaccess_proctor', ['quizid' => $record->quiz_id])->proctortype;
                 $DB->update_record('local_proview', $record);
             }
         }
-
-        // Proview savepoint reached.
-        upgrade_plugin_savepoint(true, 2023090401, 'local', 'proview');
+        upgrade_plugin_savepoint(true, 2023090402, 'local', 'proview');
     }
 
 
