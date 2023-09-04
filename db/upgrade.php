@@ -80,6 +80,5 @@ function xmldb_local_proview_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020082401, 'local', 'proview');
     }
 
-
     return true;
 }
