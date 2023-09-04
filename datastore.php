@@ -51,6 +51,10 @@ if ($post && ($post->sesskey == sesskey())) {
                         ]);
         print $response;
         return;
+    } else {
+        // ToDo: Remove this after debugging. Dump all the attempts for the quiz in question.
+        $attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id));
+        var_dump('$USER =>', $USER->id, '$attempt =>', $attempt);
     }
     http_response_code(404);
     print "Attempt not found";
