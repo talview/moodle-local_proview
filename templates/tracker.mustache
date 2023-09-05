@@ -74,7 +74,7 @@
         }
         function findAttemptIdInRow(row) {
                 let checkbox = row.querySelector("input[type='checkbox'][name='attemptid[]']");
-                if (checkbox) { console.log("checkbox value=",checkbox.value);
+                if (checkbox) {
                     return checkbox.value;
                 }
                 console.log("Attempt not found");
