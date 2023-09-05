@@ -39,7 +39,8 @@ $post = json_decode(file_get_contents('php://input'));
 
 if ($post && ($post->sesskey == sesskey())) {
     $attempt = $DB->get_record('quiz_attempts',
-        array('quiz' => $post->quiz_id, 'userid' => $post->user_id, 'state' => 'inprogress'));
+        array('quiz' => $post->quiz_id, 'userid' => $USER->id, 'state' => 'inprogress'));
+    var_dump('$attempt =>', $attempt);   // ToDo: Remove this after debugging.
     if ($attempt && $attempt->id) {
         // Inserting attempt data in local_proview table.
         $response = $DB->insert_record('local_proview', [
@@ -50,9 +51,14 @@ if ($post && ($post->sesskey == sesskey())) {
                         ]);
         print $response;
         return;
+    } else {
+        // ToDo: Remove this after debugging. Dump all the attempts for the quiz in question.
+        $attempt = $DB->get_record('quiz_attempts', array('quiz' => $post->quiz_id));
+        var_dump('$USER =>', $USER->id, '$attempt =>', $attempt);
     }
     http_response_code(404);
     print "Attempt not found";
+    return;
 }
 
 $query = $_SERVER['QUERY_STRING'];
