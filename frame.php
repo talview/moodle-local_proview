@@ -95,10 +95,15 @@ echo $OUTPUT->header();
         skipHardwareTest,
         previewStyle, 
         clear) {
-        const referenceLinksArray = reference_link.split('\r\n').map(link => {
-            const [url, caption] = link.split('::');
-            return { 'url': url, 'caption': caption };
-        });
+        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g).map(markdownLink => {
+            const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
+            if (match) {
+                const caption = match[1];
+                const url = match[2];
+                return { 'url': url, 'caption': caption };
+            }
+            return null;
+        }).filter(link => link !== null);
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
