@@ -167,6 +167,8 @@ echo $OUTPUT->header();
                 if (retries > 0) {
                   retries-=1;
                   run();
+                }else if(xmlhttp.readyState === 4) {
+                    Sentry.captureException(new Error(xmlhttp));
                 }
               }
             }
