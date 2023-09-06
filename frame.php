@@ -167,20 +167,8 @@ echo $OUTPUT->header();
                 if (retries > 0) {
                   retries-=1;
                   run();
-                } else if(xmlhttp.readyState === 4) {
-                  ProctorClient3.stop(function() {
-                    window.ProviewStatus = 'stop';
-                  });
-                  document.body.style.margin = '0px';
-                  document.body.innerHTML = `<iframe id="errorIFrame"
-                          src='https://pages.talview.com/proview/error/index.html'
-                          title="Proview Error"
-                          style="width: 100%;
-                          height:100%;
-                          border: 0px;">
-                      <p>Your browser does not support iframes</p>
-                  </iframe>`;
-                  Sentry.captureException(new Error(xmlhttp.response));
+                }else if(xmlhttp.readyState === 4) {
+                    Sentry.captureException(new Error(xmlhttp));
                 }
               }
             }
