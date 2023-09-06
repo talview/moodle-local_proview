@@ -88,8 +88,6 @@ function xmldb_local_proview_upgrade($oldversion) {
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
-        }
-        if ($dbman->field_exists($table, $field)) {
             $records = $DB->get_records('local_proview');
             foreach ($records as $record) {
                 $record->proctor_type = $DB->get_record('quizaccess_proctor', ['quizid' => $record->quiz_id])->proctortype;

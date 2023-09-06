@@ -155,7 +155,7 @@ echo $OUTPUT->header();
             "quiz_id"       : urlParams.get('quizId'),
             "proview_url"   : proview_playback_url+'/'+id,
             "sesskey"       : "<?php echo $sesskey ?>",
-              "proctor_type": session_type
+            "proctor_type"  : session_type
           }
           const xmlhttp = new XMLHttpRequest();
           
