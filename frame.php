@@ -95,10 +95,15 @@ echo $OUTPUT->header();
         skipHardwareTest,
         previewStyle, 
         clear) {
-        const referenceLinksArray = reference_link.split('\r\n').map(link => {
-            const [url, caption] = link.split(':');
-            return { 'url': url, 'caption': caption };
-        });
+        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g).map(markdownLink => {
+            const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
+            if (match) {
+                const caption = match[1];
+                const url = match[2];
+                return { 'url': url, 'caption': caption };
+            }
+            return null;
+        }).filter(link => link !== null);
       let url = proview_url || '//cdn.proview.io/init.js';
       document.getElementById('contentIFrame').src = window.iframeUrl;
       //script to load the proview STARTS
@@ -111,7 +116,7 @@ echo $OUTPUT->header();
             session: session,
             session_type: session_type,
             additionalInstruction: additionalInstruction,
-            referenceLinks: referenceLinksArray,
+            referenceLinks: JSON.stringify(referenceLinksArray),
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
@@ -162,20 +167,8 @@ echo $OUTPUT->header();
                 if (retries > 0) {
                   retries-=1;
                   run();
-                } else if(xmlhttp.readyState === 4) {
-                  ProctorClient3.stop(function() {
-                    window.ProviewStatus = 'stop';
-                  });
-                  document.body.style.margin = '0px';
-                  document.body.innerHTML = `<iframe id="errorIFrame"
-                          src='https://pages.talview.com/proview/error/index.html'
-                          title="Proview Error"
-                          style="width: 100%;
-                          height:100%;
-                          border: 0px;">
-                      <p>Your browser does not support iframes</p>
-                  </iframe>`;
-                  Sentry.captureException(new Error(xmlhttp.response));
+                }else if(xmlhttp.readyState === 4) {
+                    Sentry.captureException(new Error(xmlhttp));
                 }
               }
             }
