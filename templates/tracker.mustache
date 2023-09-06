@@ -72,6 +72,14 @@
         function onProviewStop(url) {
 
         }
+        function findAttemptIdInRow(row) {
+                let checkbox = row.querySelector("input[type='checkbox'][name='attemptid[]']");
+                if (checkbox) {
+                    return checkbox.value;
+                }
+                console.log("Attempt not found");
+                return null;
+            }
         let current = window.location.href;
         let childOrigin = '*';  // can be location origin, replace with you domain
         if(current.match('mod/quiz/(attempt|summary)') ) {
@@ -131,7 +139,7 @@
             parentNode.appendChild(node);
             thead.firstChild.appendChild(parentNode);
             for (let i = 0; i < tbody.children.length; i++) {
-                let attempt_id = tbody.children[i].firstChild.firstChild && tbody.children[i].firstChild.firstChild.value || null;
+            let attempt_id = findAttemptIdInRow(tbody.children[i]);
                 if(tbody.children[i].children.length == 1){                                     {{! Logic to handle last 2 rows of table and not append in hidden rows  }}
                     tbody.children[i].firstChild.setAttribute("colspan",parseInt(tbody.children[i].firstChild.getAttribute('colspan'))+1);
                     let emptyNode=document.createElement('TD');
