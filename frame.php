@@ -95,7 +95,7 @@ echo $OUTPUT->header();
         skipHardwareTest,
         previewStyle, 
         clear) {
-        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g).map(markdownLink => {
+        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g)?.map(markdownLink => {
             const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
                 const caption = match[1];
