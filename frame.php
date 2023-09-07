@@ -95,7 +95,7 @@ echo $OUTPUT->header();
         skipHardwareTest,
         previewStyle, 
         clear) {
-        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g).map(markdownLink => {
+        const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g)?.map(markdownLink => {
             const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
                 const caption = match[1];
@@ -120,7 +120,7 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: createCallback(proview_playback_url, profileId)/* onProviewStart */
+            initCallback: createCallback(proview_playback_url, profileId, session_type)/* onProviewStart */
       });
     }
 
