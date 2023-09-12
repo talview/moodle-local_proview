@@ -156,13 +156,10 @@
                 node.addEventListener("click",()=>{
                 const proctor_type = attempts[attempt_id].proctor_type;
                 let url = attempts[attempt_id].proview_url;
-                if(url.includes('?token=')){
-                    iframe.setAttribute("src", url);
-                }
-                else if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
+                if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
                             auth_token =`{{auth_token}}`;
                             let external_session_id='';
-                            const quiz_id=attempts[attempt_id].quizid;
+                            const quiz_id=attempts[attempt_id].quiz;
                             const user_id=attempts[attempt_id].userid;
                             const attempt_no=attempts[attempt_id].attempt_no;
                             const external_attendee_id=user_id;
@@ -176,11 +173,12 @@
                             const token=fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token);
                             token.then((token)=>{
                                 url=attempts[attempt_id].proview_url;
+                                table.setAttribute("style","display: none");
+                                modal.setAttribute("style","display: block");
                                 iframe.setAttribute("src", url + '/?token=' + token.token);
                             });
                      }
-                    table.setAttribute("style","display: none");
-                    modal.setAttribute("style","display: block");
+
                 })
                 node.appendChild(textnode);
                 parentNode = document.createElement("TD");  
