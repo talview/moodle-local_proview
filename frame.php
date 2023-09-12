@@ -54,7 +54,7 @@ echo $OUTPUT->header();
         integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" 
         crossorigin="anonymous">
 </script>
-<script>
+    <script>
     var childOrigin = '*';
     Sentry.init({
       dsn: 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587'

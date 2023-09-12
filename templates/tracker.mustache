@@ -148,18 +148,37 @@
                     tbody.children[i+1].appendChild(emptyNode);
                     break;
                 }
-                textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||""); 
-
+                textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||"");
                 node = document.createElement("a");    
                 node.setAttribute("title", "Proview Link");
                 node.setAttribute("href", attempts[attempt_id]&&attempts[attempt_id].proview_url||"");
                 node.setAttribute("target", "proview");
-                node.addEventListener("click",()=>{                                             {{! Event to display I frame containing Proview admin }}
-                    table.setAttribute("style","display: none");
-                    modal.setAttribute("style","display: block");
+                node.addEventListener("click",()=>{
+                const proctor_type = attempts[attempt_id].proctor_type;
+                     if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
+                            auth_token =`{{auth_token}}`;
+                            let external_session_id='';
+                            const quiz_id=attempts[attempt_id].quiz_id;
+                            const user_id=attempts[attempt_id].user_id;
+                            const attempt_no=attempts[attempt_id].attempt_no;
+                            const external_attendee_id=user_id;
+                            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
+                                 external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
+                             }
+                            else if(proctor_type=='live_proctor'){
+                                     external_session_id= quiz_id+'-'+user_id;
+                            }
+                            const proctor_token= '{{token}}';
+                            const token=fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token);
+                            token.then((token)=>{
+                                const url=attempts[attempt_id].proview_url;
+                                table.setAttribute("style","display: none");
+                                modal.setAttribute("style","display: block");
+                                iframe.setAttribute("src", url + '/?token=' + token.token);
+                            });
+                     }
                 })
-                node.appendChild(textnode);   
-
+                node.appendChild(textnode);
                 parentNode = document.createElement("TD");  
                 parentNode.setAttribute("id", `mod-quiz-report-overview-report_r${i}_c${tbody.children[i].children.length}`);
                 parentNode.setAttribute("class", `cell c${tbody.children[i].children.length}`);
@@ -199,6 +218,25 @@
         }
         if(!current.match('mod/quiz/(attempt|summary|startattempt|view)') && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
+        }
+       function fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token){
+            const url = `{{proview_callback_url}}`+'/token/playback';
+            const data = {
+                proctor_token: proctor_token,
+                validity: 120,
+                external_session_id: external_session_id,
+                external_attendee_id: external_attendee_id
+            };
+            const options = {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ` +auth_token
+                }
+            };
+            return fetch(url, options)
+                .then(response => response.json())
         }
     {{/enabled}}
 {{/js}}
