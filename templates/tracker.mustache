@@ -129,13 +129,13 @@
             let node = document.createElement("A");
             node.setAttribute("href", "");
 
-            let parentNode = document.createElement("TH"); 
+            let parentNode = document.createElement("TH");
             parentNode.setAttribute("scope", "col");
             parentNode.setAttribute("class", `header c${thead.firstChild.children.length}`);
 
             let textnode = document.createTextNode("Proview URL");
 
-            node.appendChild(textnode);   
+            node.appendChild(textnode);
             parentNode.appendChild(node);
             thead.firstChild.appendChild(parentNode);
             for (let i = 0; i < tbody.children.length; i++) {
@@ -149,13 +149,12 @@
                     break;
                 }
                 textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||"");
-                node = document.createElement("a");    
+                node = document.createElement("a");
                 node.setAttribute("title", "Proview Link");
                 node.setAttribute("href", attempts[attempt_id]&&attempts[attempt_id].proview_url||"");
                 node.setAttribute("target", "proview");
                 node.addEventListener("click",()=>{
                 const proctor_type = attempts[attempt_id].proctor_type;
-                let url = attempts[attempt_id].proview_url;
                 if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
                             auth_token =`{{auth_token}}`;
                             let external_session_id='';
@@ -172,7 +171,7 @@
                             const proctor_token= '{{token}}';
                             const token=fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token);
                             token.then((token)=>{
-                                url=attempts[attempt_id].proview_url;
+                                const url=attempts[attempt_id].proview_url;
                                 table.setAttribute("style","display: none");
                                 modal.setAttribute("style","display: block");
                                 iframe.setAttribute("src", url + '/?token=' + token.token);
@@ -181,15 +180,15 @@
 
                 })
                 node.appendChild(textnode);
-                parentNode = document.createElement("TD");  
+                parentNode = document.createElement("TD");
                 parentNode.setAttribute("id", `mod-quiz-report-overview-report_r${i}_c${tbody.children[i].children.length}`);
                 parentNode.setAttribute("class", `cell c${tbody.children[i].children.length}`);
-                parentNode.appendChild(node);                   
+                parentNode.appendChild(node);
                 tbody.children[i].appendChild(parentNode);
             }
             {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), ENDS }}
 
-            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}   
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}
             var modal = document.createElement('div');
             modal.setAttribute("id","modal");
             modal.setAttribute("name","modal");
@@ -212,7 +211,7 @@
             modal.appendChild(close);
             modal.appendChild(iframe);
             table.parentNode.appendChild(modal);
-            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}   
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}
         }
 
         if(current.match('mod/quiz/(attempt|summary)') && window.self != window.top) {
