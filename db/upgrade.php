@@ -80,7 +80,7 @@ function xmldb_local_proview_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020082401, 'local', 'proview');
     }
 
-    if ($oldversion < 2023090702) {
+    if ($oldversion < 2023091202) {
         $table = new xmldb_table('local_proview');
         $field = new xmldb_field('proctor_type', XMLDB_TYPE_TEXT, null, null, null, null, null, 'attempt_no');
 
@@ -92,7 +92,7 @@ function xmldb_local_proview_upgrade($oldversion) {
                 $DB->update_record('local_proview', $record);
             }
         }
-        upgrade_plugin_savepoint(true, 2023090702, 'local', 'proview');
+        upgrade_plugin_savepoint(true, 2023091202, 'local', 'proview');
     }
 
 
