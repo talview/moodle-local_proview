@@ -155,7 +155,12 @@
                 node.setAttribute("target", "proview");
                 node.addEventListener("click",()=>{
                 const proctor_type = attempts[attempt_id].proctor_type;
-                if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
+                let url = attempts[attempt_id].proview_url;
+                if(url.includes('?token=')){
+                    console.log('token already present');
+                    iframe.setAttribute("src", url);
+                }
+                else if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
                             auth_token =`{{auth_token}}`;
                             let external_session_id='';
                             const quiz_id=attempts[attempt_id].quiz;
@@ -171,13 +176,12 @@
                             const proctor_token= '{{token}}';
                             const token=fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token);
                             token.then((token)=>{
-                                const url=attempts[attempt_id].proview_url;
-                                table.setAttribute("style","display: none");
-                                modal.setAttribute("style","display: block");
+                                url=attempts[attempt_id].proview_url;
                                 iframe.setAttribute("src", url + '/?token=' + token.token);
                             });
-                     }
-
+                }
+                table.setAttribute("style","display: none");
+                modal.setAttribute("style","display: block");
                 })
                 node.appendChild(textnode);
                 parentNode = document.createElement("TD");
@@ -202,7 +206,7 @@
             var close = document.createElement('div');
             close.setAttribute("style","width: 100%;");
             close.setAttribute("align","left");
-            close.innerHTML ='<span style="cursor: pointer">x</span>';
+            close.innerHTML ='<span style="cursor: pointer">X</span>';
             close.addEventListener("click", ()=>{
                 table.setAttribute("style","display: block");
                 modal.setAttribute("style","display: none");

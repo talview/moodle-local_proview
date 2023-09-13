@@ -159,6 +159,7 @@ class tracker
                             $external_attendee_id = $quiz_attempt->userid;
                             $playback_details = self::fetchPlaybackDetails($template->token, $external_session_id, $external_attendee_id, $template->auth_token, $template->proview_callback_url);
                             $session_uuid = $playback_details['session_uuid'];
+                            $playback_token= $playback_details['token'];
                             $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid ;
                             $response = $DB->insert_record('local_proview', [
                                 "quiz_id" => $quiz->id,
@@ -168,12 +169,14 @@ class tracker
                                 "proctor_type" => $quiz_attempt->proctor_type,
                             ]);
                             print $response;
+                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid . '/?token=' . $playback_token ;
 
                         } else if ($quiz_attempt->proctor_type==='live_proctor') {
                             $external_attendee_id = $quiz_attempt->userid;
                             $external_session_id = $quiz_attempt->quiz . '-' . $quiz_attempt->userid;
                             $playback_details = self::fetchPlaybackDetails($template->token, $external_session_id, $external_attendee_id, $template->auth_token, $template->proview_callback_url);
                             $session_uuid = $playback_details['session_uuid'];
+                            $playback_token= $playback_details['token'];
                             $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid ;
                             $response = $DB->insert_record('local_proview', [
                                 "quiz_id" => $quiz->id,
@@ -183,6 +186,7 @@ class tracker
                                 "proctor_type" => $quiz_attempt->proctor_type,
                             ]);
                             print $response;
+                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid . '/?token=' . $playback_token ;
                         }
                     }
                 }
