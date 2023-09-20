@@ -45,7 +45,53 @@ class tracker
      * @return void As the insertion is done through the {js} template API.
      */
 
-    private static function generate_auth_token($api_base_url, $payload)
+    public static function fetchSecureToken($external_session_id, $external_attendee_id)
+    {
+        $api_base_url = trim(get_config('quizaccess_proctor', 'proview_callback_url'));
+        $auth_payload = new \stdClass();
+        $auth_payload->username = trim(get_config('quizaccess_proctor', 'proview_admin_username'));
+        $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
+        $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
+        $auth_token = json_decode($auth_response)->access_token;
+        $base_url = get_config('quizaccess_proctor', 'proview_callback_url');
+        $proctor_token = get_config('local_proview', 'token');
+        $url = $base_url . '/token/playback';
+
+        $data = array(
+            'proctor_token' => $proctor_token,
+            'validity' => 120,
+            'external_session_id' => $external_session_id,
+            'external_attendee_id' => $external_attendee_id
+        );
+        $options = array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n" .
+                    "Authorization: Bearer " . $auth_token,
+                'content' => json_encode($data)
+            )
+        );
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
+        return json_decode($response, true);
+
+    }
+    public static function storeFallbackDetails($attempt_no, $proview_url, $proctor_type, $user_id, $quiz_id)
+    {
+        global $DB;
+        $response = $DB->insert_record('local_proview', [
+            "quiz_id" => $quiz_id,
+            "proview_url" => $proview_url,
+            "user_id" => $user_id,
+            "attempt_no" => $attempt_no,
+            "proctor_type" => $proctor_type,
+        ]);
+        return $response;
+    }
+
+
+
+private static function generate_auth_token($api_base_url, $payload)
     {
         $curl = curl_init();
         curl_setopt_array($curl, [
@@ -78,33 +124,10 @@ class tracker
         }
     }
 
-
     private static function capture_error(\Throwable $err)
     {
         \Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587']);
         \Sentry\captureException($err);
-    }
-
-
-    private static function fetchPlaybackDetails($proctor_token, $external_session_id, $external_attendee_id, $auth_token, $proview_callback_url) {
-        $url = "{$proview_callback_url}/token/playback";
-        $data = array(
-            'proctor_token' => $proctor_token,
-            'validity' => 120,
-            'external_session_id' => $external_session_id,
-            'external_attendee_id' => $external_attendee_id
-        );
-        $options = array(
-            'http' => array(
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n" .
-                    "Authorization: Bearer " . $auth_token,
-                'content' => json_encode($data)
-            )
-        );
-        $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
-        return json_decode($response, true);
     }
 
     public static function insert_tracking()
@@ -120,8 +143,6 @@ class tracker
         $template->profile_id = $USER->id;
         $template->proview_callback_url = get_config('quizaccess_proctor', 'proview_callback_url');
         $template->proview_playback_url = get_config('local_proview', 'proview_playback_url');
-
-
         $cm = $PAGE->cm;
         if ($cm && $cm->instance) {
             $quiz = $DB->get_record('quiz', array('id' => $cm->instance));      // Fetching current quiz data for password.
@@ -138,13 +159,6 @@ class tracker
                 $attempt = $attempt->attempt;
             }
             $template->current_attempt = $attempt;
-            $api_base_url = trim(get_config('quizaccess_proctor', 'proview_callback_url'));
-            $auth_payload = new \stdClass();
-            $auth_payload->username = trim(get_config('quizaccess_proctor', 'proview_admin_username'));
-            $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
-            $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
-            $template->auth_token = json_decode($auth_response)->access_token;
-
 
             if (strpos($PAGE->url, ('mod/quiz/report'))) {
                 $quiz_attempts = $DB->get_records('quiz_attempts', array('quiz' => $quiz->id));
@@ -153,42 +167,6 @@ class tracker
                     $quiz_attempt->proview_url = isset($local_proview_data->proview_url) ? $local_proview_data->proview_url : '';
                     $quiz_attempt->proctor_type = isset($local_proview_data->proctor_type) ? $local_proview_data->proctor_type : $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id), 'proctortype')->proctortype;
                     $quiz_attempt->attempt_no = $quiz_attempt->attempt;
-                    if (trim($quiz_attempt->proview_url) === '' && $quiz_attempt->state === 'finished'){
-                        if ($quiz_attempt->proctor_type==='ai_proctor' || $quiz_attempt->proctor_type==='record_and_review') {
-                            $external_session_id = $quiz_attempt->quiz . '-' . $quiz_attempt->userid . '-' . $quiz_attempt->attempt_no;
-                            $external_attendee_id = $quiz_attempt->userid;
-                            $playback_details = self::fetchPlaybackDetails($template->token, $external_session_id, $external_attendee_id, $template->auth_token, $template->proview_callback_url);
-                            $session_uuid = $playback_details['session_uuid'];
-                            $playback_token= $playback_details['token'];
-                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid ;
-                            $response = $DB->insert_record('local_proview', [
-                                "quiz_id" => $quiz->id,
-                                "proview_url" => $quiz_attempt->proview_url,
-                                "user_id" => $quiz_attempt->userid,
-                                "attempt_no" => $quiz_attempt->id,
-                                "proctor_type" => $quiz_attempt->proctor_type,
-                            ]);
-                            print $response;
-                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid . '/?token=' . $playback_token ;
-
-                        } else if ($quiz_attempt->proctor_type==='live_proctor') {
-                            $external_attendee_id = $quiz_attempt->userid;
-                            $external_session_id = $quiz_attempt->quiz . '-' . $quiz_attempt->userid;
-                            $playback_details = self::fetchPlaybackDetails($template->token, $external_session_id, $external_attendee_id, $template->auth_token, $template->proview_callback_url);
-                            $session_uuid = $playback_details['session_uuid'];
-                            $playback_token= $playback_details['token'];
-                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid ;
-                            $response = $DB->insert_record('local_proview', [
-                                "quiz_id" => $quiz->id,
-                                "proview_url" => $quiz_attempt->proview_url,
-                                "user_id" => $quiz_attempt->userid,
-                                "attempt_no" => $quiz_attempt->id,
-                                "proctor_type" => $quiz_attempt->proctor_type,
-                            ]);
-                            print $response;
-                            $quiz_attempt->proview_url = $template->proview_playback_url . '/' . $session_uuid . '/?token=' . $playback_token ;
-                        }
-                    }
                 }
                 $template->attempts = json_encode($quiz_attempts);
             }
