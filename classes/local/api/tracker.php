@@ -53,9 +53,8 @@ class tracker
         $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
         $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
         $auth_token = json_decode($auth_response)->access_token;
-        $base_url = get_config('quizaccess_proctor', 'proview_callback_url');
-        $proctor_token = get_config('local_proview', 'token');
-        $url = $base_url . '/token/playback';
+        $proctor_token = trim(get_config('local_proview', 'token'));
+        $url = $api_base_url . '/token/playback';
 
         $data = array(
             'proctor_token' => $proctor_token,
@@ -136,13 +135,13 @@ private static function generate_auth_token($api_base_url, $payload)
 
         $pageinfo = get_context_info_array($PAGE->context->id);
         $template = new stdClass();
-        $template->proview_url = get_config('local_proview', 'proview_url');
-        $template->token = get_config('local_proview', 'token');
-        $template->enabled = get_config('local_proview', 'enabled');
-        $template->root_dir = get_config('local_proview', 'root_dir');
+        $template->proview_url = trim(get_config('local_proview', 'proview_url'));
+        $template->token = trim(get_config('local_proview', 'token'));
+        $template->enabled = trim(get_config('local_proview', 'enabled'));
+        $template->root_dir = trim(get_config('local_proview', 'root_dir'));
         $template->profile_id = $USER->id;
-        $template->proview_callback_url = get_config('quizaccess_proctor', 'proview_callback_url');
-        $template->proview_playback_url = get_config('local_proview', 'proview_playback_url');
+        $template->proview_callback_url = trim(get_config('quizaccess_proctor', 'proview_callback_url'));
+        $template->proview_playback_url = trim(get_config('local_proview', 'proview_playback_url'));
         $cm = $PAGE->cm;
         if ($cm && $cm->instance) {
             $quiz = $DB->get_record('quiz', array('id' => $cm->instance));      // Fetching current quiz data for password.
