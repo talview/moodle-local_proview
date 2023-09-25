@@ -55,26 +55,25 @@ class tracker
         $auth_token = json_decode($auth_response)->access_token;
         $proctor_token = trim(get_config('local_proview', 'token'));
         $url = $api_base_url . '/token/playback';
-
         $data = array(
             'proctor_token' => $proctor_token,
             'validity' => 120,
             'external_session_id' => $external_session_id,
             'external_attendee_id' => $external_attendee_id
         );
-        $options = array(
-            'http' => array(
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n" .
-                    "Authorization: Bearer " . $auth_token,
-                'content' => json_encode($data)
-            )
-        );
-        $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $auth_token
+        ));
+        $response = curl_exec($ch);
+        curl_close($ch);
         return json_decode($response, true);
-
     }
+
     public static function storeFallbackDetails($attempt_no, $proview_url, $proctor_type, $user_id, $quiz_id)
     {
         global $DB;
@@ -177,9 +176,4 @@ private static function generate_auth_token($api_base_url, $payload)
         }
     }
 }
-
-
-
-
-
 

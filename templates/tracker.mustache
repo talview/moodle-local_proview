@@ -162,13 +162,7 @@
                     node.addEventListener("click", () => {
                         const proctor_type = attempts[attempt_id].proctor_type;
                         if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
-                            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
-                                 external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
-                             }
-                            else if(proctor_type=='live_proctor'){
-                                     external_session_id= quiz_id+'-'+user_id;
-                            }
-                            fetchSecureToken(external_session_id, external_attendee_id)
+                            processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id)
                             .then(function(response) {
                                  console.log("Playback details:", response);
                                     const attempt = attempts[attempt_id].id;
@@ -199,14 +193,7 @@
                 node.addEventListener("click",()=>{
                 const proctor_type = attempts[attempt_id].proctor_type;
                  if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
-                            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
-                                 external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
-                             }
-                            else if(proctor_type=='live_proctor'){
-                                     external_session_id= quiz_id+'-'+user_id;
-                            }
-
-                            fetchSecureToken(external_session_id, external_attendee_id)
+                            processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id)
                             .then(function(response) {
                             console.log("Secure token:", response.token);
                                 url=attempts[attempt_id].proview_url;
@@ -304,6 +291,15 @@
                     }
                     });
                 });
+        }
+        function processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id){
+            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
+             external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
+            }
+            else if(proctor_type=='live_proctor'){
+            external_session_id= quiz_id+'-'+user_id;
+            }
+            return (fetchSecureToken(external_session_id, external_attendee_id));
         }
     {{/enabled}}
 {{/js}}
