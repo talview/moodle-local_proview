@@ -129,13 +129,13 @@
             let node = document.createElement("A");
             node.setAttribute("href", "");
 
-            let parentNode = document.createElement("TH"); 
+            let parentNode = document.createElement("TH");
             parentNode.setAttribute("scope", "col");
             parentNode.setAttribute("class", `header c${thead.firstChild.children.length}`);
 
             let textnode = document.createTextNode("Proview URL");
 
-            node.appendChild(textnode);   
+            node.appendChild(textnode);
             parentNode.appendChild(node);
             thead.firstChild.appendChild(parentNode);
             for (let i = 0; i < tbody.children.length; i++) {
@@ -148,46 +148,74 @@
                     tbody.children[i+1].appendChild(emptyNode);
                     break;
                 }
+                let external_session_id='';
+                const quiz_id=attempts[attempt_id].quiz;
+                const user_id=attempts[attempt_id].userid;
+                const attempt_no=attempts[attempt_id].attempt_no;
+                const external_attendee_id=user_id;
                 textnode = document.createTextNode(attempts[attempt_id]&&"Proctor link"||"");
-                node = document.createElement("a");    
+                if(attempts[attempt_id]&&attempts[attempt_id].proview_url===''){
+                    node = document.createElement("a");
+                    node.appendChild(document.createTextNode("Resync "));
+                    node.setAttribute("title", "Resync ");
+                    node.setAttribute("class", "btn btn-warning btn-sm");
+                    node.addEventListener("click", () => {
+                        const proctor_type = attempts[attempt_id].proctor_type;
+                        if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
+                            processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id)
+                            .then(function(response) {
+                                 console.log("Playback details:", response);
+                                    const attempt = attempts[attempt_id].id;
+                                    const session_uuid = response.session_uuid;
+                                    const proview_url = `{{proview_playback_url}}` + '/' + session_uuid;
+                                    attempts[attempt_id].proview_url = proview_url;
+                                    storeFallbackDetails(quiz_id, user_id, attempt ,proview_url, proctor_type)
+                                    .then(function(response){
+                                        console.log("Fallback details stored:", response);
+                                        location.reload();
+                                    })
+                                    .catch(function(error) {
+                                    console.error("Error:", error);
+
+                                    });
+                            })
+                            .catch(function(error) {
+                            console.error("Error:", error);
+                            });
+                        }
+                    });
+                }
+                else{
+                node = document.createElement("a");
                 node.setAttribute("title", "Proview Link");
                 node.setAttribute("href", attempts[attempt_id]&&attempts[attempt_id].proview_url||"");
                 node.setAttribute("target", "proview");
                 node.addEventListener("click",()=>{
                 const proctor_type = attempts[attempt_id].proctor_type;
-                     if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
-                            auth_token =`{{auth_token}}`;
-                            let external_session_id='';
-                            const quiz_id=attempts[attempt_id].quiz_id;
-                            const user_id=attempts[attempt_id].user_id;
-                            const attempt_no=attempts[attempt_id].attempt_no;
-                            const external_attendee_id=user_id;
-                            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
-                                 external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
-                             }
-                            else if(proctor_type=='live_proctor'){
-                                     external_session_id= quiz_id+'-'+user_id;
-                            }
-                            const proctor_token= '{{token}}';
-                            const token=fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token);
-                            token.then((token)=>{
-                                const url=attempts[attempt_id].proview_url;
-                                table.setAttribute("style","display: none");
-                                modal.setAttribute("style","display: block");
-                                iframe.setAttribute("src", url + '/?token=' + token.token);
+                 if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'||proctor_type=='live_proctor'){
+                            processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id)
+                            .then(function(response) {
+                            console.log("Secure token:", response.token);
+                                url=attempts[attempt_id].proview_url;
+                                iframe.setAttribute("src", url + '/?token=' + response.token);
+                            })
+                            .catch(function(error) {
+                            console.error("Error:", error);
                             });
-                     }
-                })
+                            table.setAttribute("style","display: none");
+                            modal.setAttribute("style","display: block");
+                } }); }
                 node.appendChild(textnode);
-                parentNode = document.createElement("TD");  
+                parentNode = document.createElement("TD");
                 parentNode.setAttribute("id", `mod-quiz-report-overview-report_r${i}_c${tbody.children[i].children.length}`);
                 parentNode.setAttribute("class", `cell c${tbody.children[i].children.length}`);
-                parentNode.appendChild(node);                   
+                parentNode.appendChild(node);
                 tbody.children[i].appendChild(parentNode);
-            }
+
+}
             {{! Logic to append Proview Url Column in Attempts table in moodle UI (<Quiz> -> Settings -> Grades (Nested under Results)), ENDS }}
 
-            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}   
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) STARTS }}
             var modal = document.createElement('div');
             modal.setAttribute("id","modal");
             modal.setAttribute("name","modal");
@@ -201,7 +229,7 @@
             var close = document.createElement('div');
             close.setAttribute("style","width: 100%;");
             close.setAttribute("align","left");
-            close.innerHTML ='<span style="cursor: pointer">x</span>';
+            close.innerHTML ='<span style="cursor: pointer">X</span>';
             close.addEventListener("click", ()=>{
                 table.setAttribute("style","display: block");
                 modal.setAttribute("style","display: none");
@@ -210,7 +238,7 @@
             modal.appendChild(close);
             modal.appendChild(iframe);
             table.parentNode.appendChild(modal);
-            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}   
+            {{! Logic to display Proview admin in iframe and hide the attempts table (and vice-versa) ENDS }}
         }
 
         if(current.match('mod/quiz/(attempt|summary)') && window.self != window.top) {
@@ -219,24 +247,59 @@
         if(!current.match('mod/quiz/(attempt|summary|startattempt|view)') && window.self != window.top ) {
           parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
         }
-       function fetchSecureToken(proctor_token,external_session_id,external_attendee_id,auth_token){
-            const url = `{{proview_callback_url}}`+'/token/playback';
-            const data = {
-                proctor_token: proctor_token,
-                validity: 120,
-                external_session_id: external_session_id,
-                external_attendee_id: external_attendee_id
-            };
-            const options = {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ` +auth_token
-                }
-            };
-            return fetch(url, options)
-                .then(response => response.json())
+        function fetchSecureToken(external_session_id, external_attendee_id) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{root_dir}}local/proview/fetch-secure-token.php",
+                    data: {
+                        action: "fetch_secure_token",
+                        external_session_id: external_session_id,
+                        external_attendee_id: external_attendee_id,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        resolve(response);
+                    },
+                    error: function (error) {
+                    console.error("Error fetching secure token:", error);
+                    reject(error);
+                    }
+                    });
+                });
+        }
+        function storeFallbackDetails(quiz_id, user_id, attempt_no, proview_url, proctor_type) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{root_dir}}local/proview/store-fallback-details.php",
+                    data: {
+                        action: "store_fallback_details",
+                        quiz_id: quiz_id,
+                        user_id: user_id,
+                        attempt_no: attempt_no,
+                        proview_url: proview_url,
+                        proctor_type: proctor_type
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        resolve(response);
+                    },
+                    error: function (error) {
+                    console.error("Error storing fallback details:", error);
+                    reject(error);
+                    }
+                    });
+                });
+        }
+        function processSecureToken(proctor_type, quiz_id, user_id, attempt_no, external_attendee_id){
+            if(proctor_type=='ai_proctor'||proctor_type=='record_and_review'){
+             external_session_id= quiz_id+'-'+user_id+'-'+attempt_no;
+            }
+            else if(proctor_type=='live_proctor'){
+            external_session_id= quiz_id+'-'+user_id;
+            }
+            return (fetchSecureToken(external_session_id, external_attendee_id));
         }
     {{/enabled}}
 {{/js}}
