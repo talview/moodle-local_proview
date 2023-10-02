@@ -54,7 +54,7 @@ echo $OUTPUT->header();
         integrity="sha384-4zdOhGLDdcXl+MRlpApt/Nvfe6A3AqGGBil9+lwFSkXNTv0rVx0eCyM1EaJCXS7r" 
         crossorigin="anonymous">
 </script>
-<script>
+    <script>
     var childOrigin = '*';
     Sentry.init({
       dsn: 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587'
@@ -120,11 +120,11 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            initCallback: createCallback(proview_playback_url, profileId)/* onProviewStart */
+            initCallback: createCallback(proview_playback_url, profileId, session_type)/* onProviewStart */
       });
     }
 
-    function createCallback (proview_playback_url, profile_id) {
+    function createCallback (proview_playback_url, profile_id, session_type) {
       return function onProviewStart(err, id) {
         try {
           const urlParams = new URLSearchParams(window.location.search);
@@ -154,7 +154,8 @@ echo $OUTPUT->header();
             "user_id"       : profile_id,
             "quiz_id"       : urlParams.get('quizId'),
             "proview_url"   : proview_playback_url+'/'+id,
-            "sesskey"       : "<?php echo $sesskey ?>"
+            "sesskey"       : "<?php echo $sesskey ?>",
+            "proctor_type"  : session_type
           }
           const xmlhttp = new XMLHttpRequest();
           

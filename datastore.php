@@ -46,7 +46,8 @@ if ($post && ($post->sesskey == sesskey())) {
                             "quiz_id" => $post->quiz_id,
                             "proview_url" => $post->proview_url,
                             "user_id" => $USER->id,
-                            "attempt_no" => $attempt->id
+                            "attempt_no" => $attempt->id,
+                            "proctor_type" => $post->proctor_type,
                         ]);
         print $response;
         return;
