@@ -64,7 +64,7 @@ class injector {
     public static function inject() {
         global $USER, $COURSE, $DB, $PAGE;
         $page_path =  $PAGE->url->get_path();
-        if (!preg_match('/mod\/quiz\/(attempt|summary|startattempt|view|report)/',$page_path )) {
+        if (!preg_match('/mod\/quiz\/(attempt|summary|startattempt|report)/',$page_path )) {
             return;
         }
         $enabled = get_config('local_proview', 'enabled');
