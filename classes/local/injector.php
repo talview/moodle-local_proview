@@ -64,7 +64,7 @@ class injector {
     public static function inject() {
         global $USER, $COURSE, $DB, $PAGE;
         $page_path =  $PAGE->url->get_path();
-        if (!preg_match('/mod\/quiz\/(attempt|summary|startattempt|report)/',$page_path )) {
+        if (!preg_match('/mod\/quiz\/(attempt|summary|startattempt|view|report)/',$page_path )) {
             return;
         }
         $enabled = get_config('local_proview', 'enabled');
@@ -106,29 +106,18 @@ class injector {
                 }
                 // Logic for enabling specific user to use proctored assessment ENDS.
             }
-            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and TSB is enabled STARTS
-            if ($PAGE->cm) {
-                $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
-                if ((strpos ($PAGE->url, ('mod/quiz/attempt')) !== FALSE
-                        || strpos ($PAGE->url, ('mod/quiz/summary')) !== FALSE)
-                    && ($quizaccess_proctor_setting_enabled
-                            && $quizaccess_proctor_setting->tsbenabled)
-                    && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB")  === FALSE ){
-                    $redirectURL = "tsb://".explode("://",$PAGE->url)[1];
-                    $tsbURL = "https://pages.talview.com/tsb/index.html?redirect_url=".$redirectURL."&user=".$_SERVER ['HTTP_USER_AGENT'];
-                    // $PAGE->requires->js_amd_inline("document.location.replace('" . $tsbURL . "')");
-                    if (!headers_sent()) {
-                        header('Location: '.$tsbURL);
-                    } else {
-                        echo ("<script>location.href='$tsbURL'</script>");
-                    }
-                    die;
-                }
-            }
-            // Logic for enabling Talview Safe Exam Browser if proctoring is enabled and TSB is enabled ENDS
             if (self::$injected) {
                 return;
             }
+
+            // Logic for preventing proview load for tsb enabled quizzes until TSB loads START"
+            $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
+            $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
+            if ($quizaccess_proctor_setting->tsbenabled && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB")  === FALSE) {
+                return ;
+            }
+            // Logic for preventing proview load for tsb enabled quizzes until TSB loads ENDS"
+
             self::$injected = true;
             $t = new api\tracker();
             $t::insert_tracking();
