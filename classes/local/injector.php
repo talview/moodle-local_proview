@@ -114,6 +114,7 @@ class injector {
             $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
             $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
             if ($quizaccess_proctor_setting->tsbenabled && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB")  === FALSE) {
+                self::inject_password($PAGE, $quiz);
                 return ;
             }
             // Logic for preventing proview load for tsb enabled quizzes until TSB loads ENDS"
