@@ -28,12 +28,12 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2023100201;
+$plugin->version  = 2023120302;
 $plugin->requires = 2020061500;
-$plugin->release = '3.2.0 (Build: 2023100201)';
+$plugin->release = '3.3.0 (Build: 2023120302)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_proview';
 
 $plugin->dependencies = array(
-    'quizaccess_proctor' => 2023090601,
+    'quizaccess_proctor' => 2023120302,
 );
