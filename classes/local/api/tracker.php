@@ -30,7 +30,6 @@ namespace local_proview\local\api;
 
 use stdClass;
 
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once('../../config.php');
