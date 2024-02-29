@@ -354,9 +354,9 @@ class provider implements
      * @param array $reply An array containing Reply to addresses
      * @param array $from An array containing from addresses
      * @param string $txt The main body of the mail in plain text
-     * @return boolean true if mail is sent otherwise false
+     * @return bool true if mail is sent otherwise false
      */
-    private static function send_mail(array $to, array $reply, array $from, string $txt) : boolean {
+    private static function send_mail(array $to, array $reply, array $from, string $txt) : bool {
         $sitename = get_site();
         $token = get_config('local_proview', 'token');
         $account = get_config('local_proview', 'proview_acc_name');
