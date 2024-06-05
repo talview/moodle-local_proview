@@ -32,6 +32,9 @@ use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once('../../config.php');
+require_once($CFG->libdir.'/filelib.php');
+
 /**
  * Guniversal analytics class.
  * @copyright  Talview, 2020
@@ -47,12 +50,13 @@ class tracker
 
     public static function fetchSecureToken($external_session_id, $external_attendee_id)
     {
+        $curl = new \curl();
         $api_base_url = trim(get_config('quizaccess_proctor', 'proview_callback_url'));
         $auth_payload = new \stdClass();
         $auth_payload->username = trim(get_config('quizaccess_proctor', 'proview_admin_username'));
         $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
         $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
-        $auth_token = json_decode($auth_response)->access_token;
+        $auth_token = $auth_response['access_token'];
         $proctor_token = trim(get_config('local_proview', 'token'));
         $url = $api_base_url . '/token/playback';
         $data = array(
@@ -61,17 +65,14 @@ class tracker
             'external_session_id' => $external_session_id,
             'external_attendee_id' => $external_attendee_id
         );
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $auth_token
-        ));
-        $response = curl_exec($ch);
-        curl_close($ch);
-        return json_decode($response, true);
+        try {
+            $curl->setHeader(array('Content-Type: application/json', 'Authorization: Bearer ' . $auth_token));
+            $response = $curl->post($url, json_encode($data));
+            $decoded_response = json_decode($response, true);
+            return $decoded_response;
+        } catch (\Throwable $err) {
+            self::capture_error($err);
+        }
     }
 
     public static function storeFallbackDetails($attempt_no, $proview_url, $proctor_type, $user_id, $quiz_id)
@@ -91,32 +92,22 @@ class tracker
 
 private static function generate_auth_token($api_base_url, $payload)
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $api_base_url . '/auth',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode($payload),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json"
-            ],
-        ]);
+        $curl = new \curl();
+        $headers = array('Content-Type: application/json');
+        $curl->setHeader($headers);
+        $request_url = $api_base_url . '/auth';
+        $json_payload = json_encode($payload);
         try {
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            curl_close($curl);
-            if ($err) {
-                throw new CustomException($err);
-            } elseif ($response && $httpcode != 200) {
-                throw new CustomException($response);
-            } else {
-                return $response;
+            $response = $curl->post($request_url, $json_payload);
+            if ($curl->get_errno()) {
+                $error_msg = $curl->error;
+                throw new moodle_exception('errorapirequest', 'quizaccess_proctor', '', $error_msg);
             }
+            $decoded_response = json_decode($response, true);
+            if (!isset($decoded_response['access_token'])) {
+                throw new CustomException("Auth Token Not generated");
+            }
+            return $decoded_response;
         } catch (\Throwable $err) {
             self::capture_error($err);
         }
