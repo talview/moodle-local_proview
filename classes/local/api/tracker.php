@@ -87,10 +87,46 @@ class tracker
         ]);
         return $response;
     }
+    private static function redirect_to_wrapper($proctoring_payload, $quiz)
+    {
+        // TODO Add check if wrapper URL already exists
+        $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz);
+        redirect($wrapper_response->signed_short_url);
+        return;
+    }
+
+    private static function create_sb_wrapper($proctoring_payload, $quiz)
+    {
+        global $PAGE;
+        $curl = new \curl();
+        $api_base_url = trim(get_config('quizaccess_proctor', 'proview_callback_url'));
+        $auth_payload = new \stdClass();
+        $auth_payload->username = trim(get_config('quizaccess_proctor', 'proview_admin_username'));
+        $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
+        $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
+        $auth_token = $auth_response['access_token'];
+        $url = $api_base_url . '/v1/wrapper/create';
+        $data = array(
+            'session_external_id' => $proctoring_payload->session_id,
+            'attendee_external_id' => $proctoring_payload->profile_id,
+            'redirect_url' => $PAGE->url->__toString(),
+            'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose ),
+            'is_secure_browser' => true
+        );
+        var_dump($data);
+        try {
+            $curl->setHeader(array('Content-Type: application/json', 'app-id: b37ec896-f62b-4cbe-b39f-8dd21881dfd3', 'Authorization: Bearer ' . $auth_token));
+            $response = $curl->post($url, json_encode($data));
+            $decoded_response = json_decode($response, false);
+            return $decoded_response;
+        } catch (\Throwable $err) {
+            self::capture_error($err);
+        }
+    }
 
 
 
-private static function generate_auth_token($api_base_url, $payload)
+    private static function generate_auth_token($api_base_url, $payload)
     {
         $curl = new \curl();
         $headers = array('Content-Type: application/json');
@@ -148,6 +184,21 @@ private static function generate_auth_token($api_base_url, $payload)
                 $attempt = $attempt->attempt;
             }
             $template->current_attempt = $attempt;
+            $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
+            if ($quizaccess_proctor_setting) {
+                $template->session_type = $quizaccess_proctor_setting->proctortype;
+            } else {
+                $template->session_type = "ai_proctor";
+            }
+            $template->session_id = $template->session_type === "live_proctor" ? $quiz->id.'-'.$USER->id : $quiz->id.'-'.$USER->id.'-'.$attempt;
+            if (strpos($PAGE->url, ('mod/quiz/attempt')) &&
+                $quizaccess_proctor_setting && 
+                $quizaccess_proctor_setting->proctortype == 'noproctor' && 
+                $quizaccess_proctor_setting->tsbenabled && 
+                strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB") === FALSE) {
+                self::redirect_to_wrapper($template, $quiz);
+                return;
+            }
 
             if (strpos($PAGE->url, ('mod/quiz/report'))) {
                 $quiz_attempts = $DB->get_records('quiz_attempts', array('quiz' => $quiz->id));
@@ -160,6 +211,7 @@ private static function generate_auth_token($api_base_url, $payload)
                 $template->attempts = json_encode($quiz_attempts);
             }
         }
+
         if ($pageinfo && !empty($template->token)) {
             // The templates only contains a "{js}" block; so we don't care about
             // the output; only that the $PAGE->requires are filled.
