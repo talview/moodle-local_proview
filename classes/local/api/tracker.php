@@ -105,7 +105,7 @@ class tracker
         $auth_payload->password = trim(get_config('quizaccess_proctor', 'proview_admin_password'));
         $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
         $auth_token = $auth_response['access_token'];
-        $url = $api_base_url . '/v1/wrapper/create';
+        $url = $api_base_url . '/proview/wrapper/create';
         $data = array(
             'session_external_id' => $proctoring_payload->session_id,
             'attendee_external_id' => $proctoring_payload->profile_id,
