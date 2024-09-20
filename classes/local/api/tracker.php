@@ -119,7 +119,7 @@ class tracker
         );
         var_dump($data);
         try {
-            $curl->setHeader(array('Content-Type: application/json', 'app-id: b37ec896-f62b-4cbe-b39f-8dd21881dfd3', 'Authorization: Bearer ' . $auth_token));
+            $curl->setHeader(array('Content-Type: application/json', 'Authorization: Bearer ' . $auth_token));
             $response = $curl->post($url, json_encode($data));
             $decoded_response = json_decode($response, false);
             return $decoded_response;
