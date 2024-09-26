@@ -126,11 +126,11 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            enforceTSB: tsbenabled === 1 ? true : false,
+            enforceTSB: enforceTSB === "1" ? true : false,
             blacklistedSoftwaresWindows: blacklistedSoftwaresWindows || "",
             blacklistedSoftwaresMac: blacklistedSoftwaresMac || "",
-            minimizeOption: minimizeOption === "true" ? true : false,
-            isScreenProtectionEnabled: isScreenProtectionEnabled || true,
+            minimizeOption: minimizeOption === "1" ? true : false,
+            isScreenProtectionEnabled: isScreenProtectionEnabled === "1" ? true : false,
             initCallback: createCallback(proview_playback_url, profileId, session_type)/* onProviewStart */
       });
     }
@@ -231,6 +231,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
+              console.log(response);
               startProview(
                 {
                   authToken: response.token, 

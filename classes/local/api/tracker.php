@@ -112,10 +112,10 @@ class tracker
             'redirect_url' => $PAGE->url->__toString(),
             'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose ),
             'is_secure_browser' => true,
-            'blacklisted_softwares_windows' => $quizaccess_proctor_setting->sb_blacklisted_software_windows,
-            'blacklisted_softwares_mac' => $quizaccess_proctor_setting->sb_blacklisted_software_mac,
-            'is_minimize' => $quizaccess_proctor_setting->sb_kiosk_mode_enable,
-            'is_record_screen' => $quizaccess_proctor_setting->sb_content_protection_enable
+            'blacklisted_softwares_windows' => $quizaccess_proctor_setting->blacklisted_softwares_win,
+            'blacklisted_softwares_mac' => $quizaccess_proctor_setting->blacklisted_softwares_mac,
+            'is_minimize' => $quizaccess_proctor_setting->sb_kiosk_mode,
+            'is_record_screen' => $quizaccess_proctor_setting->sb_content_protection
         );
         var_dump($data);
         try {
