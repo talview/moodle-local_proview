@@ -90,12 +90,12 @@ class tracker
     private static function redirect_to_wrapper($proctoring_payload, $quiz)
     {
         // TODO Add check if wrapper URL already exists
-        $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz);
+        $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting);
         redirect($wrapper_response->signed_short_url);
         return;
     }
 
-    private static function create_sb_wrapper($proctoring_payload, $quiz)
+    private static function create_sb_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting)
     {
         global $PAGE;
         $curl = new \curl();
@@ -111,11 +111,15 @@ class tracker
             'attendee_external_id' => $proctoring_payload->profile_id,
             'redirect_url' => $PAGE->url->__toString(),
             'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose ),
-            'is_secure_browser' => true
+            'is_secure_browser' => true,
+            'blacklisted_softwares_windows' => $quizaccess_proctor_setting->blacklisted_softwares_win,
+            'blacklisted_softwares_mac' => $quizaccess_proctor_setting->blacklisted_softwares_mac,
+            'is_minimize' => $quizaccess_proctor_setting->sb_kiosk_mode,
+            'is_record_screen' => $quizaccess_proctor_setting->sb_content_protection
         );
         var_dump($data);
         try {
-            $curl->setHeader(array('Content-Type: application/json', 'app-id: b37ec896-f62b-4cbe-b39f-8dd21881dfd3', 'Authorization: Bearer ' . $auth_token));
+            $curl->setHeader(array('Content-Type: application/json', 'Authorization: Bearer ' . $auth_token));
             $response = $curl->post($url, json_encode($data));
             $decoded_response = json_decode($response, false);
             return $decoded_response;
@@ -196,7 +200,7 @@ class tracker
                 $quizaccess_proctor_setting->proctortype == 'noproctor' && 
                 $quizaccess_proctor_setting->tsbenabled && 
                 strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB") === FALSE) {
-                self::redirect_to_wrapper($template, $quiz);
+                self::redirect_to_wrapper($template, $quiz, $quizaccess_proctor_setting);
                 return;
             }
 
