@@ -83,7 +83,7 @@ echo $OUTPUT->header();
     //Javascript function to start proview invoked upon postMessage from iframe
 
 
-    function startProview({
+    function startProview(
         authToken, 
         profileId, 
         session, 
@@ -92,15 +92,9 @@ echo $OUTPUT->header();
         additionalInstruction,
         reference_link,
         proview_playback_url,
-        enforceTSB,
-        blacklistedSoftwaresWindows,
-        blacklistedSoftwaresMac,
-        isScreenProtectionEnabled,
-        minimizeOption,
         skipHardwareTest,
         previewStyle, 
-        clear
-      }) {
+        clear) {
         const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g)?.map(markdownLink => {
             const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
@@ -126,11 +120,6 @@ echo $OUTPUT->header();
             clear: clear || false,
             skipHardwareTest: skipHardwareTest || false,
             previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
-            enforceTSB: enforceTSB === "1" ? true : false,
-            blacklistedSoftwaresWindows: blacklistedSoftwaresWindows || "",
-            blacklistedSoftwaresMac: blacklistedSoftwaresMac || "",
-            minimizeOption: minimizeOption === "1" ? true : false,
-            isScreenProtectionEnabled: isScreenProtectionEnabled === "1" ? true : false,
             initCallback: createCallback(proview_playback_url, profileId, session_type)/* onProviewStart */
       });
     }
@@ -231,23 +220,7 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(
-                {
-                  authToken: response.token, 
-                  profileId: response.profile_id, 
-                  session: response.session_id, 
-                  session_type: response.session_type, 
-                  proview_url: response.proview_url, 
-                  additionalInstruction: response.instructions, 
-                  reference_link: response.reference_link, 
-                  proview_playback_url: response.proview_playback_url,
-                  enforceTSB: response.tsbenabled,
-                  blacklistedSoftwaresWindows: response.sb_blacklisted_software_windows,
-                  blacklistedSoftwaresMac: response.sb_blacklisted_software_mac,
-                  isScreenProtectionEnabled: response.minimize_permitted,
-                  minimizeOption: response.screen_protection
-                }
-              );
+              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions, response.reference_link, response.proview_playback_url);
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);
