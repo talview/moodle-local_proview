@@ -91,7 +91,8 @@ class tracker
     {
         // TODO Add check if wrapper URL already exists
         $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz);
-        redirect($wrapper_response->signed_short_url);
+        // redirect($wrapper_response->signed_short_url);
+        echo "<script> window.location='$wrapper_response->signed_url';</script>";
         return;
     }
 
@@ -113,7 +114,7 @@ class tracker
             'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose ),
             'is_secure_browser' => true
         );
-        var_dump($data);
+        // var_dump($data);
         try {
             $curl->setHeader(array('Content-Type: application/json', 'Authorization: Bearer ' . $auth_token));
             $response = $curl->post($url, json_encode($data));
@@ -151,7 +152,7 @@ class tracker
 
     private static function capture_error(\Throwable $err)
     {
-        \Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587']);
+        \Sentry\init(['dsn' => 'https://577c4f60f7bd37671bdd8ad626d63a7d@sentry.talview.org/149']);
         \Sentry\captureException($err);
     }
 

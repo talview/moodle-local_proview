@@ -77,16 +77,15 @@ class injector {
             if ($PAGE->cm) {
                 $quiz = $DB->get_record('quiz', array('id' => $PAGE->cm->instance));
                 $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
+                //Logic for launching Secure Browser without Proctoring Starts
                 if ((!$quizaccess_proctor_setting) ||
-                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor')) {
-                        if (($quizaccess_proctor_setting->tsbenabled && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB") === FALSE)) {
-                            $t = new api\tracker();
-                            $t::insert_tracking();
-                            return;
-                        }
+                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor' && $quizaccess_proctor_setting->tsbenabled)) {
+                    $t = new api\tracker();
+                    $t::insert_tracking();
                     self::inject_password($PAGE, $quiz);
                     return;
                 }
+                //Logic for launching Secure Browser without Proctoring Ends
             }
             // Logic for enabling proview for course level and quiz level ends.
 
@@ -131,7 +130,7 @@ class injector {
             $t::insert_tracking();
             return;
         } catch (\Throwable $error) {
-            \Sentry\init(['dsn' => 'https://61facdc5414c4c73ab2b17fe902bf9ba@o286634.ingest.sentry.io/5304587' ]);
+            \Sentry\init(['dsn' => 'https://577c4f60f7bd37671bdd8ad626d63a7d@sentry.talview.org/149' ]);
             \Sentry\captureException($error);
             die;
             ?>
