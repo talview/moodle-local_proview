@@ -79,12 +79,9 @@ class injector {
                 $quizaccess_proctor_setting = $DB->get_record('quizaccess_proctor', array('quizid' => $quiz->id));
                 //Logic for launching Secure Browser without Proctoring Starts
                 if ((!$quizaccess_proctor_setting) ||
-                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor')) {
-                        if (($quizaccess_proctor_setting->tsbenabled && strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB") === FALSE)) {
-                            $t = new api\tracker();
-                            $t::insert_tracking();
-                            return;
-                        }
+                    ($quizaccess_proctor_setting && $quizaccess_proctor_setting->proctortype == 'noproctor' && $quizaccess_proctor_setting->tsbenabled)) {
+                    $t = new api\tracker();
+                    $t::insert_tracking();
                     self::inject_password($PAGE, $quiz);
                     return;
                 }
