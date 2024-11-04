@@ -84,17 +84,20 @@ echo $OUTPUT->header();
 
 
     function startProview(
-        authToken, 
-        profileId, 
-        session, 
-        session_type = "ai_proctor", 
-        proview_url, 
+        authToken,
+        profileId,
+        session,
+        session_type,
+        proview_url,
         additionalInstruction,
         reference_link,
         proview_playback_url,
-        skipHardwareTest,
-        previewStyle, 
-        clear) {
+        blacklistedSoftwaresWindows,
+        blacklistedSoftwaresMac,
+        isScreenProtectionEnabled,
+        minimizeOption,
+        tsbenabled
+        ) {
         const referenceLinksArray = reference_link.match(/\[([^\]]+)\]\(([^)]+)\)/g)?.map(markdownLink => {
             const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
@@ -117,9 +120,14 @@ echo $OUTPUT->header();
             session_type: session_type,
             additionalInstruction: additionalInstruction,
             referenceLinks: JSON.stringify(referenceLinksArray),
-            clear: clear || false,
-            skipHardwareTest: skipHardwareTest || false,
-            previewStyle: previewStyle || 'position: fixed; bottom: 0px;',
+            clear: false,
+            skipHardwareTest: false,
+            previewStyle: 'position: fixed; bottom: 0px;',
+            enforceTSB: tsbenabled,
+            blacklistedSoftwaresWindows: blacklistedSoftwaresWindows,
+            blacklistedSoftwaresMac: blacklistedSoftwaresMac,
+            isScreenProtectionEnabled: isScreenProtectionEnabled,
+            minimizeOption: minimizeOption,
             initCallback: createCallback(proview_playback_url, profileId, session_type)/* onProviewStart */
       });
     }
@@ -220,7 +228,22 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              startProview(response.token, response.profile_id, response.session_id, response.session_type, response.proview_url, response.instructions, response.reference_link, response.proview_playback_url);
+              console.log(response);
+              startProview(
+                response.token,
+                response.profile_id,
+                response.session_id,
+                response.session_type,
+                response.proview_url,
+                response.instructions,
+                response.reference_link,
+                response.proview_playback_url,
+                response.sb_blacklisted_software_windows,
+                response.sb_blacklisted_software_mac,
+                response.screen_protection,
+                response.minimize_permitted,
+                response.tsb_enabled
+              );
             }
           }
           xmlhttp.open("GET", "datastore.php?quiz_id=" + urlParams.get('quizId') + "&sesskey=" + "<?php echo $sesskey?>" , true);

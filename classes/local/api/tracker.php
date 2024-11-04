@@ -87,10 +87,10 @@ class tracker
         ]);
         return $response;
     }
-    private static function redirect_to_wrapper($proctoring_payload, $quiz)
+    private static function redirect_to_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting)
     {
         // TODO Add check if wrapper URL already exists
-        $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz);
+        $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting);
         // redirect($wrapper_response->signed_short_url);
         echo "<script> window.location='$wrapper_response->signed_url';</script>";
         return;
@@ -107,14 +107,24 @@ class tracker
         $auth_response = self::generate_auth_token($api_base_url, $auth_payload);
         $auth_token = $auth_response['access_token'];
         $url = $api_base_url . '/proview/wrapper/create';
+
+        $blacklisted_softwares_mac = isset($quiz->blacklisted_softwares_mac) ? (array) $quiz->blacklisted_softwares_mac : [];
+        $blacklisted_softwares_windows = isset($quiz->blacklisted_softwares_win) ? (array) $quiz->blacklisted_softwares_win : [];
+
         $data = array(
             'session_external_id' => $proctoring_payload->session_id,
             'attendee_external_id' => $proctoring_payload->profile_id,
             'redirect_url' => $PAGE->url->__toString(),
-            'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose ),
-            'is_secure_browser' => true
+            'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose),
+            'is_secure_browser' => true,
+            "secure_browser" => [
+                "blacklisted_softwares_mac" => $blacklisted_softwares_mac,
+                "blacklisted_softwares_windows" => $blacklisted_softwares_windows,
+                "is_record_screen" => isset($quiz->sb_content_protection) ? boolval($quiz->sb_content_protection) : false,
+                "is_minimize" => isset($quiz->sb_kiosk_mode) ? boolval($quiz->sb_kiosk_mode) : false,
+            ],
         );
-        // var_dump($data);
+
         try {
             $curl->setHeader(array('Content-Type: application/json', 'Authorization: Bearer ' . $auth_token));
             $response = $curl->post($url, json_encode($data));
@@ -124,6 +134,7 @@ class tracker
             self::capture_error($err);
         }
     }
+
 
 
 
@@ -197,7 +208,7 @@ class tracker
                 $quizaccess_proctor_setting->proctortype == 'noproctor' && 
                 $quizaccess_proctor_setting->tsbenabled && 
                 strpos($_SERVER ['HTTP_USER_AGENT'], "Proview-SB") === FALSE) {
-                self::redirect_to_wrapper($template, $quiz);
+                self::redirect_to_wrapper($template, $quiz, $quizaccess_proctor_setting);
                 return;
             }
 
