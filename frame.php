@@ -228,7 +228,6 @@ echo $OUTPUT->header();
               response=xmlhttp.responseText;
               response=JSON.parse(response);
               window.quizPassword = response.quiz_password;
-              console.log(response);
               startProview(
                 response.token,
                 response.profile_id,

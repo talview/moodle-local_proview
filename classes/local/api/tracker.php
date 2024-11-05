@@ -89,7 +89,6 @@ class tracker
     }
     private static function redirect_to_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting)
     {
-        // TODO Add check if wrapper URL already exists
         $wrapper_response = self::create_sb_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting);
         // redirect($wrapper_response->signed_short_url);
         echo "<script> window.location='$wrapper_response->signed_url';</script>";
@@ -116,7 +115,7 @@ class tracker
             'attendee_external_id' => $proctoring_payload->profile_id,
             'redirect_url' => $PAGE->url->__toString(),
             'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose),
-            'is_secure_browser' => true,
+            'is_secure_browser' => isset($quiz->tsbenabled) ? boolval($quiz->tsbenabled) : false,
             "secure_browser" => [
                 "blacklisted_softwares_mac" => $blacklisted_softwares_mac,
                 "blacklisted_softwares_windows" => $blacklisted_softwares_windows,
