@@ -95,7 +95,7 @@ class tracker
         return;
     }
 
-    private static function create_sb_wrapper($proctoring_payload, $quiz)
+    private static function create_sb_wrapper($proctoring_payload, $quiz, $quizaccess_proctor_setting)
     {
         global $PAGE;
         $curl = new \curl();
@@ -107,20 +107,29 @@ class tracker
         $auth_token = $auth_response['access_token'];
         $url = $api_base_url . '/proview/wrapper/create';
 
-        $blacklisted_softwares_mac = isset($quiz->blacklisted_softwares_mac) ? (array) $quiz->blacklisted_softwares_mac : [];
-        $blacklisted_softwares_windows = isset($quiz->blacklisted_softwares_win) ? (array) $quiz->blacklisted_softwares_win : [];
+        $blacklisted_softwares_mac = isset($quizaccess_proctor_setting->blacklisted_softwares_mac)
+            ? array_filter((array) $quizaccess_proctor_setting->blacklisted_softwares_mac, function($item) {
+                return !empty($item);
+            })
+            : [];
+
+        $blacklisted_softwares_windows = isset($quizaccess_proctor_setting->blacklisted_softwares_win)
+            ? array_filter((array) $quizaccess_proctor_setting->blacklisted_softwares_win, function($item) {
+                return !empty($item);
+            })
+            : [];
 
         $data = array(
             'session_external_id' => $proctoring_payload->session_id,
             'attendee_external_id' => $proctoring_payload->profile_id,
             'redirect_url' => $PAGE->url->__toString(),
             'expiry' => date(DATE_ISO8601, $quiz->timeclose == 0 ? strtotime("+3 days") : $quiz->timeclose),
-            'is_secure_browser' => isset($quiz->tsbenabled) ? boolval($quiz->tsbenabled) : false,
+            'is_secure_browser' => isset($quizaccess_proctor_setting->tsbenabled) ? boolval($quizaccess_proctor_setting->tsbenabled) : false,
             "secure_browser" => [
                 "blacklisted_softwares_mac" => $blacklisted_softwares_mac,
                 "blacklisted_softwares_windows" => $blacklisted_softwares_windows,
-                "is_record_screen" => isset($quiz->sb_content_protection) ? boolval($quiz->sb_content_protection) : false,
-                "is_minimize" => isset($quiz->sb_kiosk_mode) ? boolval($quiz->sb_kiosk_mode) : false,
+                "is_record_screen" => isset($quizaccess_proctor_setting->sb_content_protection) ? boolval($quizaccess_proctor_setting->sb_content_protection) : false,
+                "is_minimize" => isset($quizaccess_proctor_setting->sb_kiosk_mode) ? boolval($quizaccess_proctor_setting->sb_kiosk_mode) : false,
             ],
         );
 
