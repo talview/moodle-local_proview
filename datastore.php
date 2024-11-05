@@ -89,6 +89,15 @@ if ($sesskey == sesskey()) {
     $template->profile_id = $USER->id;
     $template->instructions = $quizaccess_proctor_setting->instructions;
     $template->reference_link= $quizaccess_proctor_setting->reference_link;
+    if ($quizaccess_proctor_setting->tsbenabled === "1" ) {
+            $template->tsb_enabled = true;
+          $template->sb_blacklisted_software_windows= isset($quizaccess_proctor_setting->blacklisted_softwares_win) ? $quizaccess_proctor_setting->blacklisted_softwares_win : '';
+            $template->sb_blacklisted_software_mac= isset($quizaccess_proctor_setting->blacklisted_softwares_mac) ? $quizaccess_proctor_setting->blacklisted_softwares_mac : '';
+            $template->minimize_permitted= isset($quizaccess_proctor_setting->sb_kiosk_mode) ? !boolval($quizaccess_proctor_setting->sb_kiosk_mode) : true;
+            $template->screen_protection= isset($quizaccess_proctor_setting->sb_content_protection) ? boolval($quizaccess_proctor_setting->sb_content_protection) : false;
+        }else{
+            $template->tsb_enabled = false;
+        }
     $template->session_id = $template->session_type === "live_proctor" ? $quizid.'-'.$USER->id : $quizid.'-'.$USER->id.'-'.$attempt;   // Do not append attempt number for live proctoring. Re-attempting same quiz not supported in live proctoring.
     $template->proview_url = trim(get_config('local_proview', 'proview_url'));
     $template->token = trim(get_config('local_proview', 'token'));

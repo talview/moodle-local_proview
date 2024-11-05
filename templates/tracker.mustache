@@ -88,7 +88,7 @@
                     parent.postMessage({type: 'stopProview',url: window.location.href}, childOrigin);
                 }
             })
-            if( window.self == window.top) {
+            if( window.self == window.top && '{{session_type}}' !== 'noproctor') {
                 let params = new URLSearchParams({
                     url: current,
                     clear: false,
@@ -97,6 +97,20 @@
                 });
                 window.location.href = '{{root_dir}}local/proview/frame.php?'+params.toString();
             }
+            // Hide back Button from quiz if exam is launched in SB Starts
+            // NOTE: This will only work for English Language due to string matching
+            if (window.navigator.userAgent.match(/Proview-SB/)) {
+                console.log("User Agent: ", window.navigator.userAgent);
+                document.querySelectorAll('a').forEach(link => {
+                    const urlContainsIndex = link.href.includes('moodle/mod/quiz/view.php');
+                    const textContainsBack = link.textContent.trim().toLowerCase().includes('back');
+                    if (urlContainsIndex && textContainsBack) {
+                        // Hide the element by setting its display style to none
+                        link.style.display = 'none';
+                    }
+                });
+            }
+            // Hide back Button from quiz if exam is launched in SB Starts
         }
         if(current.match('mod/quiz/view') ) {
             if(window.self != window.top && window.parent.previousUrl) { //checking if the request is coming from summary
@@ -108,7 +122,7 @@
             let div = document.getElementsByClassName("singlebutton quizstartbuttondiv");
             div[0].getElementsByTagName("*")[3].addEventListener("click", function(event){
               $(".moodle-dialogue-base").hide();
-              if( window.self == window.top) {
+              if( window.self == window.top && '{{session_type}}' !== 'noproctor') {
                 let params = new URLSearchParams({
                     url            : current,
                     clear          : false,
