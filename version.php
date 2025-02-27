@@ -28,9 +28,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2024110501;
+$plugin->version  = 2025022701;
 $plugin->requires = 2020061500;
-$plugin->release = '3.3.8 (Build: 2024110501)';
+$plugin->release = '3.3.9 (Build: 2025022701)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_proview';
 

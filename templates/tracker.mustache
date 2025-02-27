@@ -121,7 +121,6 @@
             }
             let div = document.getElementsByClassName("singlebutton quizstartbuttondiv");
             div[0].getElementsByTagName("*")[3].addEventListener("click", function(event){
-              $(".moodle-dialogue-base").hide();
               if( window.self == window.top && '{{session_type}}' !== 'noproctor') {
                 let params = new URLSearchParams({
                     url            : current,
