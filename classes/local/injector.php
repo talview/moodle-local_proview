@@ -130,7 +130,7 @@ class injector {
             $t::insert_tracking();
             return;
         } catch (\Throwable $error) {
-            \Sentry\init(['dsn' => 'https://577c4f60f7bd37671bdd8ad626d63a7d@sentry.talview.org/149' ]);
+            \Sentry\init(['dsn' => 'https://070e04ad3039bad6c35fe0ee09672aed@sentry.talview.org/175' ]);
             \Sentry\captureException($error);
             die;
             ?>
