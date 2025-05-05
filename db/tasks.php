@@ -1,5 +1,5 @@
 <?php
-// This file is part of the Local Proview plugin for Moodle
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,25 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Proview
+ * Definition of scheduled tasks for local_proview.
  *
- * This module provides support for remote proctoring quizzes and assessments using Proview
- *
- * @package    local_proview
- * @copyright  Talview, 2020
- * @author     Talview Inc.
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @uses       die
+ * @package   local_proview
+ * @copyright 2025 Catalyst IT
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2025022803;
-$plugin->requires = 2020061500;
-$plugin->release = '3.3.9 (Build: 2025022802)';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'local_proview';
-
-$plugin->dependencies = array(
-    'quizaccess_proctor' => 2024101501,
-);
+$tasks = [
+    [
+        'classname' => 'local_proview\task\fix_missing_proctor_records',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*/10',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+];
