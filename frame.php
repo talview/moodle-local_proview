@@ -109,7 +109,35 @@ echo $OUTPUT->header();
       //script to load the proview STARTS
       (function(i,s,o,g,r,a,m){i['TalviewProctor']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+        a.onload = function() {
+          // This function gets called on successful load of init-script-url
+          setTimeout(() => {
+            if (window.ProctorClient3) {
+              window.ProctorClient3.on('log:event:all', (data) => {
+                if(data.alert_type_id === 3) { // Session join alert type ID
+                  console.log("Session successfully initialized");
+                }
+              });
+            }
+          }, 100);
+        };
+        a.onerror = function() {
+          // Error on loading init-script-url
+          console.error("Failed to load Proview script from:", url);
+          Sentry.captureException(new Error("Failed to load Proview script: " + url));
+          document.getElementById('contentIFrame').src = 'https://pages.talview.com/proview/error/index.html';
+          
+          // Notify the parent window about the error
+          let iframeWindow = document.getElementById('contentIFrame').contentWindow;
+          if (iframeWindow) {
+            iframeWindow.postMessage({
+              type: 'proviewError',
+              error: 'Failed to load Proview script'
+            }, childOrigin);
+          }
+        };
+        m.parentNode.insertBefore(a,m)
       })(window,document,'script',url,'tv');
         tv('init', authToken,{
             profileId: profileId,
