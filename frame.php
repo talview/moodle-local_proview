@@ -57,7 +57,7 @@ echo $OUTPUT->header();
     <script>
     var childOrigin = '*';
     Sentry.init({
-      dsn: 'https://070e04ad3039bad6c35fe0ee09672aed@sentry.talview.org/175'
+      dsn: 'https://ced7a8a24d06c338fe913f68ae4d56d3@sentry.talview.com/380'
     });
     // Defining function for event handling on postMessage from any window
     function receiveMessage(event) {
